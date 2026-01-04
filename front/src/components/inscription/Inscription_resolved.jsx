@@ -72,16 +72,10 @@ const Inscription = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save token and user info from registration response
-        if (data.token) {
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        
         setSuccess(true)
         setFormData({ nom: '', email: '', password: '', confirmPassword: '' })
         setErrors({})
-        setTimeout(() => navigate('/home'), 2000)
+        setTimeout(() => navigate('/login'), 2000)
       } else {
         setErrors({ submit: data.error || 'Une erreur est survenue. Veuillez réessayer.' })
       }

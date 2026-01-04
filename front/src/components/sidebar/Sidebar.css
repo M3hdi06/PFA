@@ -95,24 +95,6 @@
 	gap: 6px;
 }
 
-/* Controls wrapper for the radius input and toggle */
-.radius-controls {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	flex: 1 1 auto;
-	/* slight left offset to visually align with other controls */
-	margin-left: -8px;
-}
-
-.radius-toggle {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	font-size: 13px;
-	color: rgba(230,238,248,0.8);
-}
-
 .filter-label {
  	font-size: 13px;
  	color: rgba(230,238,248,0.8);

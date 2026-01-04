@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
+import { CATEGORIES } from "../../constants/categories";
 
 const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddSpot = () => {}, onFilterChange = () => {} }) => {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Tous");
   const [radius, setRadius] = useState(5);
-  const [radiusEnabled, setRadiusEnabled] = useState(true);
   if (!open) {
     return (
       <button
@@ -63,89 +63,35 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddS
               className="filter-select"
               aria-label="Filtrer par catégorie"
             >
-              <optgroup label="🍔 Alimentation & boissons">
-                <option value="Restaurants">🍽️ Restaurants</option>
-                <option value="Bar">🍺 Bars</option>
-                <option value="Cafes">☕ Cafés</option>
-                <option value="VenteAEmporter">🥡 Vente à emporter</option>
-                <option value="Livraison">🚚 Livraison</option>
-              </optgroup>
-
-              <optgroup label="📍 A faire / A voir">
-                <option value="Parc">🌳 Parcs</option>
-                <option value="SalleDeSport">🏋️ Salle de sport</option>
-                <option value="Art">🎨 Art</option>
-                <option value="Attractions">🎡 Attractions</option>
-                <option value="VieNocturne">🌙 Vie nocturne</option>
-                <option value="Concerts">🎵 Concerts</option>
-                <option value="Cinemas">🎬 Cinémas</option>
-                <option value="Musees">🏛️ Musées</option>
-                <option value="Bibliotheques">📚 Bibliothèques</option>
-              </optgroup>
-
-              <optgroup label="🛍️ Shopping">
-                <option value="Supermarche">🛒 Supermarché</option>
-                <option value="Beaute">💅 Beauté</option>
-                <option value="ConcessAuto">🚗 Concess. auto</option>
-                <option value="MaisonJardin">🏡 Maison et jardin</option>
-                <option value="Vetements">👕 Vêtements</option>
-                <option value="CentresCommerciaux">🏬 Centres commerciaux</option>
-                <option value="Electronique">🔌 Électronique</option>
-                <option value="ArticlesSport">🏀 Articles de sport</option>
-              </optgroup>
-
-              <optgroup label="🔧 Services">
-                <option value="Hotels">🏨 Hôtels</option>
-                <option value="DAB">🏧 DAB</option>
-                <option value="SalonsBeaute">✂️ Salons de beauté</option>
-                <option value="LocationVoiture">🚙 Location voiture</option>
-                <option value="LavageAuto">🧽 Lavage auto</option>
-                <option value="Pressing">🧺 Pressing</option>
-                <option value="BornesRecharge">🔌 Bornes de recharge</option>
-                <option value="Carburant">⛽ Carburant</option>
-                <option value="Hopitaux">🏥 Hôpitaux et cliniques</option>
-                <option value="BibliothequesService">📚 Bibliothèques</option>
-                <option value="EnvoiCourrier">📮 Envoi de courrier</option>
-                <option value="Parking">🅿️ Parking</option>
-                <option value="Pharmacies">💊 Pharmacies</option>
-              </optgroup>
+              <option value="Tous">Tous</option>
+              {CATEGORIES.map((group) => (
+                <optgroup key={group.group} label={group.group}>
+                  {group.items.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
             </select>
           </label>
 
           <label className="filter-row">
             <span className="filter-label">Rayon</span>
-            <div className="radius-controls">
-              <label className="radius-toggle">
-                <input
-                  type="checkbox"
-                  checked={radiusEnabled}
-                  onChange={(e) => {
-                    const enabled = Boolean(e.target.checked);
-                    setRadiusEnabled(enabled);
-                    onFilterChange({ category, radius, radiusEnabled: enabled });
-                  }}
-                  aria-label="Activer le rayon"
-                />
-                <span>{radiusEnabled ? "Activé" : "Désactivé"}</span>
-              </label>
-
-              <input
-                type="range"
-                min="1"
-                max="50"
-                value={radius}
-                onChange={(e) => {
-                  const r = Number(e.target.value);
-                  setRadius(r);
-                  onFilterChange({ category, radius: r, radiusEnabled });
-                }}
-                className="range-input"
-                aria-label="Rayon de recherche en kilomètres"
-                disabled={!radiusEnabled}
-              />
-
-              <span className="radius-value">{radius} km</span>
-            </div>
+            <input
+              type="range"
+              min="1"
+              max="50"
+              value={radius}
+              onChange={(e) => {
+                const r = Number(e.target.value);
+                setRadius(r);
+                onFilterChange({ category, radius: r });
+              }}
+              className="range-input"
+              aria-label="Rayon de recherche en kilomètres"
+            />
+            <span className="radius-value">{radius} km</span>
           </label>
         </div>
 
