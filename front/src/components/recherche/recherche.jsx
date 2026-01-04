@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './recherche.css';
-import { allSpots } from '../map/Map';
+import { allSpots } from '../../constants/spots';
 
 const Recherche = ({ query = '', onResultsChange = () => {} }) => {
 
