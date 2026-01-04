@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, Circle } from "re
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
+import { CATEGORIES } from "../../constants/categories";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -32,7 +33,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
   const [spots, setSpots] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', description: '', category: 'Restaurants' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedSpot, setSelectedSpot] = useState(null);
@@ -209,6 +210,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
         body: JSON.stringify({
           name: formData.name,
           description: formData.description,
+          category: formData.category,
           lat: selectedLocation.lat,
           lng: selectedLocation.lng
         })
@@ -219,7 +221,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       if (response.ok) {
         // Add new spot to local state
         setSpots(prev => [...prev, data.spot]);
-        setFormData({ name: '', description: '' });
+        setFormData({ name: '', description: '', category: 'Restaurants' });
         setSelectedLocation(null);
         setShowForm(false);
         setError(null);
@@ -384,6 +386,28 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
             {error && <div className="spot-form-error">{error}</div>}
 
             <form onSubmit={handleAddSpot} className="spot-form">
+              <div className="form-group">
+                <label htmlFor="category">Catégorie *</label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleFormChange}
+                  className="category-select"
+                  disabled={isLoading}
+                >
+                  {CATEGORIES.map((group) => (
+                    <optgroup key={group.group} label={group.group}>
+                      {group.items.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+
               <div className="form-group">
                 <label htmlFor="name">Nom du spot *</label>
                 <input
