@@ -147,6 +147,31 @@
 	flex: 1 1 auto;
 }
 
+.radius-controls {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1 1 auto;
+	margin-left: -12px;
+}
+
+.radius-toggle {
+	display: inline-flex;
+ 	align-items: center;
+ 	gap: 6px;
+ 	font-size: 13px;
+ 	color: rgba(230,238,248,0.8);
+}
+
+.radius-toggle input[type="checkbox"] {
+ 	width: 16px;
+ 	height: 16px;
+}
+
+.range-input.disabled {
+ 	opacity: 0.45;
+}
+
 .radius-value {
 	min-width: 0;
 	margin-left: 4px;
