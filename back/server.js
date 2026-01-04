@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+const spotsRoutes = require("./routes/spots");
 
 dotenv.config({ path: path.join(__dirname, ".env") });
 
@@ -20,6 +21,9 @@ app.get("/", (req, res) => res.send("Hello Amine"));
 
 // Routes d'authentification
 app.use("/api/auth", authRoutes);
+
+// Routes des spots
+app.use("/api/spots", spotsRoutes);
 
 /**
  * Logs MongoDB (très utile)s
