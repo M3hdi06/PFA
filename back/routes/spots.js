@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Spot = require("../models/Spot");
+const { authMiddleware } = require("../middleware/auth");
 
 // ✅ GET tous les spots
 router.get("/", async (req, res) => {
@@ -58,8 +59,8 @@ router.get("/category/:category", async (req, res) => {
   }
 });
 
-// ✅ POST créer un nouveau spot
-router.post("/", async (req, res) => {
+// ✅ POST créer un nouveau spot (AUTHENTIFICATION REQUISE)
+router.post("/", authMiddleware, async (req, res) => {
   try {
     const { nom, description, category, location, lat, lng, rating } = req.body;
 

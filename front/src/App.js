@@ -8,9 +8,11 @@ import Login from "./components/login/Login";
 import Inscription from "./components/inscription/Inscription";
 import Map from "./components/map/Map";
 import SearchPage from "./components/recherche/SearchPage";
+import AddSpotModal from "./components/AddSpotModal/AddSpotModal";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showAddSpotModal, setShowAddSpotModal] = useState(false);
   const navigate = useNavigate();
 
   const handleToggle = (open) => setSidebarOpen(Boolean(open));
@@ -19,9 +21,18 @@ function App() {
     navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
+  const handleAddSpot = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    } else {
+      setShowAddSpotModal(true);
+    }
+  };
+
   return (
     <div className={`app layout-with-sidebar ${!sidebarOpen ? "sidebar-hidden" : ""}`}>
-      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} />
+      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} onAddSpot={handleAddSpot} />
       <Navbar />
       <main className="app-content">
         <Routes>
@@ -32,6 +43,8 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
         </Routes>
       </main>
+      
+      <AddSpotModal isOpen={showAddSpotModal} onClose={() => setShowAddSpotModal(false)} />
     </div>
   );
 }
