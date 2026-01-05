@@ -1,23 +1,61 @@
 .app {
   min-height: 100vh;
   background: #0f172a;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Layout when sidebar is present */
 .layout-with-sidebar {
   display: block;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.app-content {
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  transition: margin-left 200ms ease;
 }
 
 .main-content {
   margin: 0; /* remove left margin so content fills width */
   padding: 20px;
   transition: margin-left 200ms ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Desktop: adjust content when sidebar is open */
+@media (min-width: 769px) {
+  .layout-with-sidebar:not(.sidebar-hidden) .app-content {
+    margin-left: 320px;
+  }
+  
+  .layout-with-sidebar.sidebar-hidden .app-content {
+    margin-left: 0;
+  }
 }
 
 /* When sidebar collapses, it keeps min-width 64px; adjust main accordingly via media/JS if needed */
 @media (max-width: 768px) {
+  .app-content {
+    margin-left: 0 !important;
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
   .main-content {
     margin-left: 0;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
