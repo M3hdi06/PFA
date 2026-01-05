@@ -1,194 +1,189 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import './Inscription.css'
+import React, { useState } from "react";
+import "../login/Login.css";
+import { useNavigate, Link } from "react-router-dom";
 
 const Inscription = () => {
-  const [formData, setFormData] = useState({
-    nom: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  })
-  const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.nom.trim()) newErrors.nom = 'Le nom est requis'
-    if (!formData.email.trim()) newErrors.email = 'L\'email est requis'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email invalide'
-    }
-    if (!formData.password) newErrors.password = 'Le mot de passe est requis'
-    else if (formData.password.length < 6) {
-      newErrors.password = 'Minimum 6 caractères'
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas'
-    }
-    
-    return newErrors
-  }
+  const [formData, setFormData] = useState({
+    nom: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
+      [name]: value,
+    }));
+
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.nom.trim()) {
+      newErrors.nom = "Nom requis";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email requis";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email invalide";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Mot de passe requis";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Minimum 6 caractères";
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Les mots de passe ne correspondent pas";
+    }
+
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    const newErrors = validateForm()
+    e.preventDefault();
+
+    const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      return
+      setErrors(newErrors);
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
+    setErrors({});
+
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:4000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nom: formData.nom,
           email: formData.email,
-          password: formData.password
-        })
-      })
-      
+          password: formData.password,
+        }),
+      });
+
       const data = await response.json();
 
       if (response.ok) {
-        // Save token and user info from registration response
-        if (data.token) {
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        
-        setSuccess(true)
-        setFormData({ nom: '', email: '', password: '', confirmPassword: '' })
-        setErrors({})
-        setTimeout(() => navigate('/home'), 2000)
+        navigate("/login");
       } else {
-        setErrors({ submit: data.error || 'Une erreur est survenue. Veuillez réessayer.' })
+        setErrors({ submit: data.error || "Erreur d'inscription" });
       }
-    } catch (error) {
-      setErrors({ submit: 'Erreur de connexion. Vérifiez que le serveur est actif.' })
-      console.error('Registration error:', error)
+    } catch (err) {
+      setErrors({
+        submit: "Erreur de connexion. Vérifiez que le serveur est actif.",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="inscription-container">
-      <div className="inscription-card">
-        <div className="inscription-header">
-          <h1>Créer un compte</h1>
-          <p>Rejoignez-nous en quelques clics</p>
-        </div>
-
-        {success && (
-          <div className="success-message">
-            ✓ Inscription réussie! Vérifiez votre email.
+    <section className="login">
+      <div className="login__wrapper">
+        <div className="login__card">
+          <div className="login__card-header">
+            <h2>Créer un compte</h2>
+            <p className="muted">Rejoignez-nous en quelques clics.</p>
           </div>
-        )}
 
-        {errors.submit && (
-          <div className="error-message">
-            {errors.submit}
-          </div>
-        )}
+          {errors.submit && (
+            <div className="error-message">{errors.submit}</div>
+          )}
 
-        <form onSubmit={handleSubmit} className="inscription-form">
-          <div className="form-group">
-            <label htmlFor="nom">Nom complet</label>
-            <input
-              type="text"
-              id="nom"
-              name="nom"
-              value={formData.nom}
-              onChange={handleChange}
-              placeholder="Jean Dupont"
-              className={errors.nom ? 'input-error' : ''}
+          <form className="login__form" onSubmit={handleSubmit}>
+            <label>
+              Nom complet
+              <input
+                type="text"
+                name="nom"
+                value={formData.nom}
+                onChange={handleChange}
+                placeholder="Jean Dupont"
+              />
+              {errors.nom && (
+                <span className="error-text">{errors.nom}</span>
+              )}
+            </label>
+
+            <label>
+              Adresse email
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="vous@example.com"
+              />
+              {errors.email && (
+                <span className="error-text">{errors.email}</span>
+              )}
+            </label>
+
+            <label>
+              Mot de passe
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Minimum 6 caractères"
+              />
+              {errors.password && (
+                <span className="error-text">{errors.password}</span>
+              )}
+            </label>
+
+            <label>
+              Confirmer le mot de passe
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirmez votre mot de passe"
+              />
+              {errors.confirmPassword && (
+                <span className="error-text">
+                  {errors.confirmPassword}
+                </span>
+              )}
+            </label>
+
+            <button
+              type="submit"
+              className="btn-primary"
               disabled={isLoading}
-            />
-            {errors.nom && <span className="error-text">{errors.nom}</span>}
-          </div>
+            >
+              {isLoading ? "Inscription..." : "S'inscrire"}
+            </button>
+          </form>
 
-          <div className="form-group">
-            <label htmlFor="email">Adresse email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="votre@email.com"
-              className={errors.email ? 'input-error' : ''}
-              disabled={isLoading}
-            />
-            {errors.email && <span className="error-text">{errors.email}</span>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Mot de passe</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Minimum 6 caractères"
-              className={errors.password ? 'input-error' : ''}
-              disabled={isLoading}
-            />
-            {errors.password && <span className="error-text">{errors.password}</span>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmer le mot de passe</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirmez votre mot de passe"
-              className={errors.confirmPassword ? 'input-error' : ''}
-              disabled={isLoading}
-            />
-            {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
-          </div>
-
-          <button
-            type="submit"
-            className="submit-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Inscription en cours...' : 'S\'inscrire'}
-          </button>
-        </form>
-
-        <div className="inscription-footer">
-          <p>Vous avez déjà un compte? <Link to="/login">Connectez-vous</Link></p>
+          <p className="login__footer">
+            Déjà un compte ?{" "}
+            <Link className="link" to="/login">
+              Se connecter
+            </Link>
+          </p>
         </div>
       </div>
-    </div>
-  )
-}
+    </section>
+  );
+};
 
-export default Inscription
+export default Inscription;
