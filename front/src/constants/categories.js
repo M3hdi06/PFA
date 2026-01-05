@@ -22,6 +22,9 @@ export const CATEGORIES = [
       { value: "Cinemas", label: "🎬 Cinémas" },
       { value: "Musees", label: "🏛️ Musées" },
       { value: "Bibliotheques", label: "📚 Bibliothèques" },
+      { value: "Skatepark", label: "🛹 skatepark" },
+      { value: "Surf", label: "🏄‍♂️ Surf" },
+      { value: "Musique", label: "🎵 Musique" },
     ]
   },
   {

@@ -68,6 +68,23 @@ body {
   animation: slideUp 0.3s ease-out;
 }
 
+.map-instructions .cancel-marking {
+  display: inline-block;
+  margin-left: 12px;
+  padding: 4px 10px;
+  background: rgba(211, 47, 47, 0.9);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.map-instructions .cancel-marking:hover {
+  background: rgba(211, 47, 47, 1);
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -441,8 +458,188 @@ body {
   transform: scale(0.95);
 }
 
-.zoom-in {
+/* ============================================
+   RESPONSIVE - MOBILE & TABLETTE
+   ============================================ */
+
+@media screen and (max-width: 768px) {
+  /* Ajustement de la hauteur de la carte pour mobile */
+  .map-screen {
+    height: calc(100vh - 60px);
+    width: 100vw;
+  }
+
+  /* Ajustement des notifications géolocalisation */
+  .map-geo-error,
+  .map-geo-info {
+    top: 70px;
+    right: 10px;
+    left: 10px;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    max-width: calc(100vw - 20px);
+  }
+
+  /* Instructions en bas - adaptation mobile */
+  .map-instructions {
+    bottom: 80px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  /* Modal formulaire - pleine largeur sur mobile */
+  .spot-form-modal {
+    padding: 10px;
+  }
+
+  .spot-form-container {
+    max-width: 100%;
+    width: 100%;
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .spot-form-header h2 {
+    font-size: 1.2rem;
+  }
+
+  /* Form inputs - meilleure taille sur mobile */
+  .form-group input,
+  .form-group textarea,
+  .category-select {
+    font-size: 16px; /* Évite le zoom automatique sur iOS */
+    padding: 12px;
+  }
+
+  /* Boutons d'action - empilés sur mobile */
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Popup spot - meilleure taille */
+  .spot-popup {
+    max-width: 250px;
+    min-width: 200px;
+  }
+
+  .spot-popup h3 {
+    font-size: 0.95rem;
+  }
+
+  .spot-popup p {
+    font-size: 0.8rem;
+  }
+
+  /* Notifications de recherche */
+  .search-result-found,
+  .search-result-not-found {
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    max-width: calc(100vw - 20px);
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+
+  /* Contrôles de zoom - position ajustée */
+  .zoom-controls {
+    bottom: 15px;
+    right: 15px;
+    gap: 6px;
+  }
+
+  .zoom-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+
+  /* Bouton annuler dans les instructions */
+  .map-instructions .cancel-marking {
+    display: block;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: rgba(211, 47, 47, 0.9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
 }
 
-.zoom-out {
+/* Très petits écrans (téléphones en portrait) */
+@media screen and (max-width: 480px) {
+  .map-screen {
+    height: calc(100vh - 55px);
+  }
+
+  .map-geo-error,
+  .map-geo-info {
+    top: 60px;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+
+  .spot-form-container {
+    padding: 16px;
+    max-height: 85vh;
+  }
+
+  .spot-form-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .spot-popup {
+    max-width: 220px;
+    min-width: 180px;
+  }
+
+  .zoom-controls {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .zoom-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .search-result-found,
+  .search-result-not-found {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+}
+
+/* Mode paysage sur mobile */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .map-screen {
+    height: calc(100vh - 50px);
+  }
+
+  .spot-form-container {
+    max-height: 95vh;
+  }
+
+  .map-instructions {
+    bottom: 60px;
+  }
 }
