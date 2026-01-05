@@ -21,48 +21,7 @@ console.log("Starting server without MongoDB (mongoose removed)");
 
 // Mount routes (auth implementation no longer requires mongoose)
 app.use("/api/auth", authRoutes);
-
-<<<<<<< HEAD
-// Routes des spots
-app.use("/api/spots", spotsRoutes);
-
-/**
- * Logs MongoDB (très utile)s
- */
-mongoose.connection.on("connected", () => console.log("✅ [event] mongoose connected"));
-mongoose.connection.on("error", (err) => console.error("❌ [event] mongoose error:", err));
-mongoose.connection.on("disconnected", () => console.log("⚠️ [event] mongoose disconnected"));
-
-// Force un timeout pour ne pas rester “bloqué” sans message
-const connectWithTimeout = async () => {
-  const timeoutMs = 15000;
-
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error(`⏱️ Timeout MongoDB après ${timeoutMs}ms`)), timeoutMs)
-  );
-
-  try {
-    await Promise.race([
-      mongoose.connect(process.env.MONGO_URI),
-      timeoutPromise
-    ]);
-
-    console.log("✅ MongoDB connecté");
-
-    app.listen(port, () => {
-      console.log(`🚀 Server is running on port ${port}`);
-      console.log("Amine tu es prêt à travailler avec mon serveurrrrr 😄");
-    });
-  } catch (err) {
-    console.error("❌ Erreur MongoDB (catch):", err);
-    process.exit(1);
-  }
-};
-
-connectWithTimeout();
-=======
 app.listen(port, () => {
   console.log(`🚀 Server is running on port ${port}`);
   console.log("Server started without MongoDB dependency");
 });
->>>>>>> 52b1767 (last changes)
