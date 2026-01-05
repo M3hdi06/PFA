@@ -11,6 +11,7 @@ import Map from "./components/map/Map";
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({ category: 'Tous', radius: 5, radiusEnabled: true });
   const mapRef = useRef(null);
   const navigate = useNavigate();
 
@@ -32,9 +33,15 @@ function App() {
     // The Map component will handle the search
   };
 
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    // Show map so user can see the radius/circle immediately
+    navigate('/map');
+  };
+
   return (
     <div className={`app layout-with-sidebar ${!sidebarOpen ? "sidebar-hidden" : ""}`}>
-      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} onAddSpot={handleAddSpotClick} />
+      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} onAddSpot={handleAddSpotClick} onFilterChange={handleFilterChange} />
       <Navbar />
       <main className="app-content">
         <Routes>
@@ -42,7 +49,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/inscription" element={<Inscription />} />
-          <Route path="/map" element={<Map ref={mapRef} searchQuery={searchQuery} />} />
+          <Route path="/map" element={<Map ref={mapRef} searchQuery={searchQuery} filters={filters} />} />
         </Routes>
       </main>
     </div>
