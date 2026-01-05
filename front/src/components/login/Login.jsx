@@ -53,6 +53,8 @@ const Login = () => {
     }
 
     setIsLoading(true);
+    setErrors({});
+
     try {
       const response = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
@@ -108,7 +110,6 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="vous@example.com"
-                disabled={isLoading}
               />
               {errors.email && (
                 <span className="error-text">{errors.email}</span>
@@ -123,7 +124,6 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                disabled={isLoading}
               />
               {errors.password && (
                 <span className="error-text">{errors.password}</span>
