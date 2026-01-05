@@ -4,47 +4,48 @@ import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
+
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
+
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = 'Email requis';
+      newErrors.email = "Email requis";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email invalide';
+      newErrors.email = "Email invalide";
     }
-    
+
     if (!formData.password) {
-      newErrors.password = 'Mot de passe requis';
+      newErrors.password = "Mot de passe requis";
     }
-    
+
     return newErrors;
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -53,33 +54,33 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:4000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password
-        })
+          password: formData.password,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Save token and user info
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         if (formData.rememberMe) {
-          localStorage.setItem('rememberEmail', formData.email);
+          localStorage.setItem("rememberEmail", formData.email);
         }
 
-        navigate('/home');
+        navigate("/home");
       } else {
-        setErrors({ submit: data.error || 'Erreur de connexion' });
+        setErrors({ submit: data.error || "Erreur de connexion" });
       }
-    } catch (error) {
-      setErrors({ submit: 'Erreur de connexion. Vérifiez que le serveur est actif.' });
-      console.error('Login error:', error);
+    } catch (err) {
+      setErrors({
+        submit: "Erreur de connexion. Vérifiez que le serveur est actif.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -88,20 +89,6 @@ const Login = () => {
   return (
     <section className="login">
       <div className="login__wrapper">
-        <div className="login__intro">
-          <p className="eyebrow">prepfa</p>
-          <h1>Reprenez le contrôle de vos révisions.</h1>
-          <p className="muted">
-            Un espace sécurisé, des sessions guidées et un suivi précis pour
-            rester focus sur vos objectifs.
-          </p>
-          <div className="badges">
-            <span>⚡ Sessions intelligentes</span>
-            <span>🔒 Données chiffrées</span>
-            <span>📈 Statistiques en temps réel</span>
-          </div>
-        </div>
-
         <div className="login__card">
           <div className="login__card-header">
             <h2>Connexion</h2>
@@ -109,59 +96,62 @@ const Login = () => {
           </div>
 
           {errors.submit && (
-            <div className="error-message" style={{ color: '#d32f2f', marginBottom: '16px', padding: '8px 12px', backgroundColor: '#ffebee', borderRadius: '4px' }}>
-              {errors.submit}
-            </div>
+            <div className="error-message">{errors.submit}</div>
           )}
 
           <form className="login__form" onSubmit={handleLogin}>
             <label>
               Email
-              <input 
-                type="email" 
-                name="email" 
+              <input
+                type="email"
+                name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="vous@example.com"
                 disabled={isLoading}
               />
-              {errors.email && <span style={{ color: '#d32f2f', fontSize: '12px' }}>{errors.email}</span>}
+              {errors.email && (
+                <span className="error-text">{errors.email}</span>
+              )}
             </label>
 
             <label>
               Mot de passe
-              <input 
-                type="password" 
-                name="password" 
+              <input
+                type="password"
+                name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
                 disabled={isLoading}
               />
-              {errors.password && <span style={{ color: '#d32f2f', fontSize: '12px' }}>{errors.password}</span>}
+              {errors.password && (
+                <span className="error-text">{errors.password}</span>
+              )}
             </label>
 
             <div className="login__row">
               <label className="checkbox">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   name="rememberMe"
                   checked={formData.rememberMe}
                   onChange={handleChange}
-                /> 
+                />
                 <span>Se souvenir de moi</span>
               </label>
+
               <a className="link" href="#forgot">
                 Mot de passe oublié ?
               </a>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn-primary"
               disabled={isLoading}
             >
-              {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+              {isLoading ? "Connexion en cours..." : "Se connecter"}
             </button>
 
             <div className="login__divider">
@@ -169,8 +159,12 @@ const Login = () => {
             </div>
 
             <div className="login__social">
-              <button type="button" disabled={isLoading}>Google</button>
-              <button type="button" disabled={isLoading}>Microsoft</button>
+              <button type="button" disabled={isLoading}>
+                Google
+              </button>
+              <button type="button" disabled={isLoading}>
+                Microsoft
+              </button>
             </div>
           </form>
 
