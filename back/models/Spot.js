@@ -1,64 +1,33 @@
-const mongoose = require("mongoose");
+// Dummy spots data (replaces mongoose schema)
+const spots = [
+  {
+    id: 1,
+    nom: "Café du Coin",
+    description: "Petit café sympa",
+    category: "café",
+    location: "Casablanca",
+    lat: 33.5731,
+    lng: -7.5898,
+    rating: 4.5,
+    reviews: [
+      { userId: 1, comment: "Super endroit !", rating: 5, createdAt: new Date() }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 2,
+    nom: "Pizzeria Bella",
+    description: "Pizzas délicieuses",
+    category: "pizzeria",
+    location: "Casablanca",
+    lat: 33.5741,
+    lng: -7.5908,
+    rating: 4.2,
+    reviews: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
 
-const spotSchema = new mongoose.Schema({
-  nom: {
-    type: String,
-    required: [true, "Le nom du spot est requis"],
-    trim: true,
-  },
-  description: {
-    type: String,
-    trim: true,
-  },
-  category: {
-    type: String,
-    enum: ['café', 'restaurant', 'pâtisserie', 'bar', 'pizzeria', 'glacier'],
-    required: [true, "La catégorie est requise"],
-  },
-  location: {
-    type: String,
-    required: [true, "La localisation est requise"],
-  },
-  lat: {
-    type: Number,
-    required: [true, "La latitude est requise"],
-  },
-  lng: {
-    type: Number,
-    required: [true, "La longitude est requise"],
-  },
-  rating: {
-    type: Number,
-    min: 0,
-    max: 5,
-    default: 0,
-  },
-  reviews: [
-    {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      comment: String,
-      rating: {
-        type: Number,
-        min: 0,
-        max: 5,
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-module.exports = mongoose.model("Spot", spotSchema);
+module.exports = spots;

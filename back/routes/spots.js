@@ -1,199 +1,121 @@
 const express = require("express");
 const router = express.Router();
-const Spot = require("../models/Spot");
 const { authMiddleware } = require("../middleware/auth");
 
-// ✅ GET tous les spots
-router.get("/", async (req, res) => {
-  try {
-    const spots = await Spot.find().populate("reviews.userId", "nom email");
-    res.status(200).json({
-      success: true,
-      count: spots.length,
-      data: spots,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+// Dummy spots data
+let spots = [
+  {
+    id: 1,
+    nom: "Café du Coin",
+    description: "Petit café sympa",
+    category: "café",
+    location: "Casablanca",
+    lat: 33.5731,
+    lng: -7.5898,
+    rating: 4.5,
+    reviews: [{ userId: 1, comment: "Super endroit !", rating: 5, createdAt: new Date() }],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 2,
+    nom: "Pizzeria Bella",
+    description: "Pizzas délicieuses",
+    category: "pizzeria",
+    location: "Casablanca",
+    lat: 33.5741,
+    lng: -7.5908,
+    rating: 4.2,
+    reviews: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
+
+// Helper: find spot by id
+const findSpot = (id) => spots.find((s) => s.id === parseInt(id));
+
+// GET all spots
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    count: spots.length,
+    data: spots,
+  });
 });
 
-// ✅ GET un spot par ID
-router.get("/:id", async (req, res) => {
-  try {
-    const spot = await Spot.findById(req.params.id).populate("reviews.userId", "nom email");
-    if (!spot) {
-      return res.status(404).json({
-        success: false,
-        message: "Spot non trouvé",
-      });
-    }
-    res.status(200).json({
-      success: true,
-      data: spot,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+// GET one spot by id
+router.get("/:id", (req, res) => {
+  const spot = findSpot(req.params.id);
+  if (!spot)
+    return res.status(404).json({ success: false, message: "Spot non trouvé" });
+
+  res.status(200).json({ success: true, data: spot });
 });
 
-// ✅ GET spots filtrés par catégorie
-router.get("/category/:category", async (req, res) => {
-  try {
-    const spots = await Spot.find({ category: req.params.category }).populate("reviews.userId", "nom email");
-    res.status(200).json({
-      success: true,
-      count: spots.length,
-      data: spots,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+// GET spots by category
+router.get("/category/:category", (req, res) => {
+  const filtered = spots.filter((s) => s.category === req.params.category);
+  res.status(200).json({ success: true, count: filtered.length, data: filtered });
 });
 
-// ✅ POST créer un nouveau spot (AUTHENTIFICATION REQUISE)
-router.post("/", authMiddleware, async (req, res) => {
-  try {
-    const { nom, description, category, location, lat, lng, rating } = req.body;
+// POST create new spot
+router.post("/", authMiddleware, (req, res) => {
+  const { nom, description, category, location, lat, lng, rating } = req.body;
+  if (!nom || !category || !location || lat === undefined || lng === undefined)
+    return res.status(400).json({ success: false, message: "Champs requis manquants" });
 
-    // Valider les champs requis
-    if (!nom || !category || !location || lat === undefined || lng === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "Les champs nom, category, location, lat et lng sont requis",
-      });
-    }
+  const newSpot = {
+    id: spots.length ? spots[spots.length - 1].id + 1 : 1,
+    nom,
+    description,
+    category,
+    location,
+    lat,
+    lng,
+    rating: rating || 0,
+    reviews: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-    const spot = new Spot({
-      nom,
-      description,
-      category,
-      location,
-      lat,
-      lng,
-      rating: rating || 0,
-    });
-
-    await spot.save();
-    res.status(201).json({
-      success: true,
-      message: "Spot créé avec succès",
-      data: spot,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  spots.push(newSpot);
+  res.status(201).json({ success: true, message: "Spot créé", data: newSpot });
 });
 
-// ✅ PUT modifier un spot
-router.put("/:id", async (req, res) => {
-  try {
-    const spot = await Spot.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body, updatedAt: Date.now() },
-      { new: true, runValidators: true }
-    );
+// PUT update spot
+router.put("/:id", (req, res) => {
+  const spot = findSpot(req.params.id);
+  if (!spot)
+    return res.status(404).json({ success: false, message: "Spot non trouvé" });
 
-    if (!spot) {
-      return res.status(404).json({
-        success: false,
-        message: "Spot non trouvé",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Spot modifié avec succès",
-      data: spot,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  Object.assign(spot, req.body, { updatedAt: new Date() });
+  res.status(200).json({ success: true, message: "Spot modifié", data: spot });
 });
 
-// ✅ DELETE supprimer un spot
-router.delete("/:id", async (req, res) => {
-  try {
-    const spot = await Spot.findByIdAndDelete(req.params.id);
+// DELETE spot
+router.delete("/:id", (req, res) => {
+  const index = spots.findIndex((s) => s.id === parseInt(req.params.id));
+  if (index === -1) return res.status(404).json({ success: false, message: "Spot non trouvé" });
 
-    if (!spot) {
-      return res.status(404).json({
-        success: false,
-        message: "Spot non trouvé",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Spot supprimé avec succès",
-      data: spot,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  const removed = spots.splice(index, 1)[0];
+  res.status(200).json({ success: true, message: "Spot supprimé", data: removed });
 });
 
-// ✅ POST ajouter une review à un spot
-router.post("/:id/reviews", async (req, res) => {
-  try {
-    const { userId, comment, rating } = req.body;
+// POST add review
+router.post("/:id/reviews", (req, res) => {
+  const spot = findSpot(req.params.id);
+  if (!spot) return res.status(404).json({ success: false, message: "Spot non trouvé" });
 
-    if (!userId || rating === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "userId et rating sont requis",
-      });
-    }
+  const { userId, comment, rating } = req.body;
+  if (!userId || rating === undefined)
+    return res.status(400).json({ success: false, message: "userId et rating requis" });
 
-    const spot = await Spot.findById(req.params.id);
+  spot.reviews.push({ userId, comment, rating, createdAt: new Date() });
+  spot.rating =
+    spot.reviews.reduce((sum, r) => sum + r.rating, 0) / spot.reviews.length;
 
-    if (!spot) {
-      return res.status(404).json({
-        success: false,
-        message: "Spot non trouvé",
-      });
-    }
-
-    spot.reviews.push({
-      userId,
-      comment,
-      rating,
-    });
-
-    // Calculer le rating moyen
-    const avgRating = spot.reviews.reduce((acc, review) => acc + review.rating, 0) / spot.reviews.length;
-    spot.rating = avgRating;
-
-    await spot.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Review ajoutée avec succès",
-      data: spot,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  res.status(201).json({ success: true, message: "Review ajoutée", data: spot });
 });
 
 module.exports = router;
