@@ -59,7 +59,7 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddS
               onChange={(e) => {
                 const val = e.target.value;
                 setCategory(val);
-                onFilterChange({ category: val, radius: radiusEnabled ? radius : null });
+                onFilterChange({ category: val, radius: radiusEnabled ? radius : null, radiusEnabled });
               }}
               className="filter-select"
               aria-label="Filtrer par catégorie"
@@ -87,7 +87,7 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddS
                   onChange={(e) => {
                     const en = e.target.checked;
                     setRadiusEnabled(en);
-                    onFilterChange({ category, radius: en ? radius : null });
+                      onFilterChange({ category, radius: en ? radius : null, radiusEnabled: en });
                   }}
                   aria-label="Activer le filtrage par rayon"
                 />
@@ -102,7 +102,7 @@ const Sidebar = ({ open = true, onToggle = () => {}, onSearch = () => {}, onAddS
                 onChange={(e) => {
                   const r = Number(e.target.value);
                   setRadius(r);
-                  if (radiusEnabled) onFilterChange({ category, radius: r });
+                  if (radiusEnabled) onFilterChange({ category, radius: r, radiusEnabled });
                 }}
                 className={`range-input ${radiusEnabled ? "" : "disabled"}`}
                 aria-label="Rayon de recherche en kilomètres"

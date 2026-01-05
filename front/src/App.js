@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/sidebar/Sidebar";
@@ -13,12 +13,17 @@ import AddSpotModal from "./components/AddSpotModal/AddSpotModal";
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showAddSpotModal, setShowAddSpotModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({ category: 'Tous', radius: 5, radiusEnabled: true });
+  const mapRef = useRef(null);
   const navigate = useNavigate();
 
   const handleToggle = (open) => setSidebarOpen(Boolean(open));
+
   const handleSearch = (query) => {
-    // Navigue vers la page de recherche avec la requête
-    navigate(`/search?q=${encodeURIComponent(query)}`);
+    setSearchQuery(query);
+    // Prefer showing results on the map
+    navigate('/map');
   };
 
   const handleAddSpot = () => {
@@ -30,9 +35,23 @@ function App() {
     }
   };
 
+  const handleAddSpotClick = () => {
+    navigate('/map');
+    setTimeout(() => {
+      if (mapRef.current && typeof mapRef.current.enableMarkingMode === 'function') {
+        mapRef.current.enableMarkingMode();
+      }
+    }, 250);
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    navigate('/map');
+  };
+
   return (
     <div className={`app layout-with-sidebar ${!sidebarOpen ? "sidebar-hidden" : ""}`}>
-      <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} onAddSpot={handleAddSpot} />
+  <Sidebar open={sidebarOpen} onToggle={handleToggle} onSearch={handleSearch} onAddSpot={handleAddSpotClick} onFilterChange={handleFilterChange} />
       <Navbar />
       <main className="app-content">
         <Routes>
@@ -41,6 +60,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/inscription" element={<Inscription />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/map" element={<Map ref={mapRef} searchQuery={searchQuery} filters={filters} />} />
         </Routes>
       </main>
       
