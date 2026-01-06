@@ -1,16 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const { generateToken } = require("../middleware/auth");
+const User = require("../models/User");
 
 const router = express.Router();
-
-// In-memory users store (simple replacement for MongoDB)
-// NOTE: This is ephemeral and resets when the server restarts.
-const users = [];
-
-// Helper: find user by email
-const findUserByEmail = (email) => users.find((u) => u.email === email);
-const findUserById = (id) => users.find((u) => u.id === id);
 
 // @POST /api/auth/register
 router.post("/register", async (req, res) => {
@@ -20,23 +13,24 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ success: false, message: "Tous les champs sont requis" });
     }
 
-    if (findUserByEmail(email)) {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).json({ success: false, message: "Cet email est déjà utilisé" });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
-    const user = { id: Date.now().toString(), nom, email, password: hashed, createdAt: new Date() };
-    users.push(user);
+    const user = new User({ nom, email, password: hashed });
+    await user.save();
 
-    const token = generateToken(user.id);
+    const token = generateToken(user._id);
 
     res.status(201).json({
       success: true,
       message: "Inscription réussie",
       token,
-      user: { id: user.id, nom: user.nom, email: user.email }
+      user: { id: user._id, nom: user.nom, email: user.email }
     });
   } catch (error) {
     console.error("Erreur inscription:", error);
@@ -52,14 +46,14 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ success: false, message: "Email et mot de passe requis" });
     }
 
-    const user = findUserByEmail(email);
+    const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ success: false, message: "Email ou mot de passe incorrect" });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) return res.status(401).json({ success: false, message: "Email ou mot de passe incorrect" });
 
-    const token = generateToken(user.id);
-    res.status(200).json({ success: true, message: "Connexion réussie", token, user: { id: user.id, nom: user.nom, email: user.email } });
+    const token = generateToken(user._id);
+    res.status(200).json({ success: true, message: "Connexion réussie", token, user: { id: user._id, nom: user.nom, email: user.email } });
   } catch (error) {
     console.error("Erreur connexion:", error);
     res.status(500).json({ success: false, message: "Erreur lors de la connexion", error: error.message });
@@ -67,7 +61,7 @@ router.post("/login", async (req, res) => {
 });
 
 // @GET /api/auth/me
-router.get("/me", (req, res) => {
+router.get("/me", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ success: false, message: "Token manquant" });
@@ -75,10 +69,10 @@ router.get("/me", (req, res) => {
     const jwt = require("jsonwebtoken");
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret_key_prepfa");
 
-    const user = findUserById(decoded.userId);
+    const user = await User.findById(decoded.userId);
     if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
 
-    res.status(200).json({ success: true, user: { id: user.id, nom: user.nom, email: user.email } });
+    res.status(200).json({ success: true, user: { id: user._id, nom: user.nom, email: user.email } });
   } catch (error) {
     res.status(401).json({ success: false, message: "Token invalide" });
   }
