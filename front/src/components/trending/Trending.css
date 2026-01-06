@@ -1,0 +1,16 @@
+.trending-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.trending-page h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.trending-page p {
+  font-size: 1.2rem;
+  color: #666;
+}
