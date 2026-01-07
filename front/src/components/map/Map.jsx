@@ -158,11 +158,11 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
 
   const fetchSpots = async () => {
     try {
-      // Use public endpoint - no auth needed, see all spots from all users
-      const response = await fetch('http://localhost:4000/api/spots/public');
+      // Récupérer tous les spots
+      const response = await fetch('http://localhost:4000/api/spots');
       if (response.ok) {
         const data = await response.json();
-        setSpots(data.spots || []);
+        setSpots(data.data || []);
       } else {
         console.error('Failed to fetch spots:', response.status, response.statusText);
       }
@@ -208,9 +208,10 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          name: formData.name,
+          nom: formData.name,
           description: formData.description,
           category: formData.category,
+          location: 'À définir',
           lat: selectedLocation.lat,
           lng: selectedLocation.lng
         })
@@ -220,7 +221,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
 
       if (response.ok) {
         // Add new spot to local state
-        setSpots(prev => [...prev, data.spot]);
+        setSpots(prev => [...prev, data.data]);
         setFormData({ name: '', description: '', category: 'Restaurants' });
         setSelectedLocation(null);
         setShowForm(false);

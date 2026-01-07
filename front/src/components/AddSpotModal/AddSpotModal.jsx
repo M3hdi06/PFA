@@ -28,7 +28,7 @@ const AddSpotModal = ({ isOpen, onClose }) => {
 
     try {
       // Vérifier si l'utilisateur est connecté
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       if (!token) {
         setError('Tu dois être connecté pour ajouter un spot');
         setIsLoading(false);
