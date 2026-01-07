@@ -318,6 +318,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
             <Popup>
               <div className="spot-popup">
                 <h3>{spot.name}</h3>
+                {spot.category && <p className="spot-category">📍 {spot.category}</p>}
                 {spot.createdByName && <p className="spot-creator">👤 {spot.createdByName}</p>}
                 {spot.description && <p>{spot.description}</p>}
                 <button 
