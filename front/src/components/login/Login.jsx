@@ -75,6 +75,9 @@ const Login = () => {
           localStorage.setItem("rememberEmail", formData.email);
         }
 
+        // Notifier le Navbar du changement d'authentification
+        window.dispatchEvent(new Event('authChange'));
+
         navigate("/home");
       } else {
         setErrors({ submit: data.error || "Erreur de connexion" });
