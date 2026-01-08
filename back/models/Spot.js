@@ -48,6 +48,10 @@ const spotSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

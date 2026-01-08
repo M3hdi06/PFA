@@ -265,6 +265,35 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
     setIsMarkingMode(false);
   };
 
+  const handleLikeSpot = async (spotId) => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      alert('Vous devez être connecté pour liker');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/spots/${spotId}/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        fetchSpots(); // Recharger les spots
+        alert('Spot liké !');
+      } else {
+        alert(data.message || 'Erreur lors du like');
+      }
+    } catch (error) {
+      console.error('Error liking spot:', error);
+      alert('Erreur de connexion');
+    }
+  };
+
   const handleDeleteSpot = async (spotId) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce spot ?')) return;
 
@@ -292,20 +321,6 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       console.error('Error deleting spot:', error);
       alert('Erreur de connexion');
     }
-  };
-
-  const handleLikeSpot = (spotId) => {
-    setSpots(prev =>
-      prev.map(s =>
-        s.id === spotId
-          ? { 
-              ...s, 
-              likes: s.liked ? (s.likes > 0 ? s.likes - 1 : 0) : (s.likes == 0 ? s.likes + 1 : 1),
-              liked: true
-            }
-          : s
-      )
-    );
   };
 
   // Centre par défaut global si pas de position utilisateur
@@ -363,9 +378,9 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
                 <div className="spot-like">
                   <button 
                     onClick={() => handleLikeSpot(spot.id)} 
-                    className={`like-btn ${spot.liked ? 'liked' : ''}`}
+                    className="like-btn"
                   >
-                    ❤️ {spot.likes || 0}
+                    ❤️ {spot.likes ? spot.likes.length : 0}
                   </button>
                 </div>
 

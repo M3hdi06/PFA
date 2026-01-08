@@ -2,15 +2,118 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 .trending-page h1 {
   font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   color: #333;
+  text-align: center;
 }
 
 .trending-page p {
   font-size: 1.2rem;
   color: #666;
 }
+
+.no-trending {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+}
+
+.trending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.trending-card {
+  display: flex;
+  gap: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.trending-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.trending-rank {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #2b7cff;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trending-card:nth-child(1) .trending-rank {
+  color: #ffd700;
+}
+
+.trending-card:nth-child(2) .trending-rank {
+  color: #c0c0c0;
+}
+
+.trending-card:nth-child(3) .trending-rank {
+  color: #cd7f32;
+}
+
+.trending-content {
+  flex: 1;
+}
+
+.trending-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.trending-category {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.trending-description {
+  font-size: 0.95rem;
+  color: #777;
+  margin-bottom: 1rem;
+}
+
+.trending-stats {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.like-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-weight: 600;
+}
+
+.like-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(238, 90, 111, 0.4);
+}
+
+.error {
+  color: #ff4444;
+  text-align: center;
+  padding: 1rem;
+}
+

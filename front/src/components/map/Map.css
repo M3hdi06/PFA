@@ -330,6 +330,29 @@ body {
   word-break: break-word;
 }
 
+.spot-like {
+  margin: 10px 0;
+}
+
+.like-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: 100%;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.like-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(238, 90, 111, 0.4);
+}
+
 .delete-spot-btn {
   background: #d32f2f;
   color: white;

@@ -120,4 +120,79 @@ router.post("/:id/reviews", async (req, res) => {
   }
 });
 
+// POST like a spot
+router.post("/:id/like", authMiddleware, async (req, res) => {
+  try {
+    const spot = await Spot.findById(req.params.id);
+    if (!spot)
+      return res.status(404).json({ success: false, message: "Spot non trouvé" });
+
+    const userId = req.user.userId;
+
+    if (spot.likes.includes(userId)) {
+      return res.status(400).json({ success: false, message: "Vous avez déjà liké ce spot" });
+    }
+
+    spot.likes.push(userId);
+    await spot.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Spot liké", 
+      likesCount: spot.likes.length 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erreur serveur", error: error.message });
+  }
+});
+
+// DELETE unlike a spot
+router.delete("/:id/like", authMiddleware, async (req, res) => {
+  try {
+    const spot = await Spot.findById(req.params.id);
+    if (!spot)
+      return res.status(404).json({ success: false, message: "Spot non trouvé" });
+
+    const userId = req.user.userId;
+
+    if (!spot.likes.includes(userId)) {
+      return res.status(400).json({ success: false, message: "Vous n'avez pas liké ce spot" });
+    }
+
+    spot.likes = spot.likes.filter(id => id.toString() !== userId.toString());
+    await spot.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Like retiré", 
+      likesCount: spot.likes.length 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erreur serveur", error: error.message });
+  }
+});
+
+// GET trending spots (top 5)
+router.get("/trending/top", async (req, res) => {
+  try {
+    const spots = await Spot.find().sort({ createdAt: -1 });
+    
+    const trendingSpots = spots
+      .map(spot => ({
+        ...spot.toObject(),
+        likesCount: spot.likes ? spot.likes.length : 0
+      }))
+      .sort((a, b) => b.likesCount - a.likesCount)
+      .slice(0, 5);
+
+    res.status(200).json({
+      success: true,
+      count: trendingSpots.length,
+      data: trendingSpots
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erreur serveur", error: error.message });
+  }
+});
+
 module.exports = router;
