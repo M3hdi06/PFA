@@ -65,7 +65,7 @@ const Recherche = ({ query = '', onResultsChange = () => {} }) => {
             </p>
             {filteredResults.map(spot => (
               <div key={spot.id} className="result-item" onClick={() => handleResultClick(spot)}>
-                <h3>{spot.category}</h3>
+                <h3>{spot.name || `${spot.category} - ${spot.location}`}</h3>
                 <p className="result-category">{spot.category}</p>
                 <p className="result-location">📍 {spot.location}</p>
               </div>
