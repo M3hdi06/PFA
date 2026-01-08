@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './AddSpotModal.css';
+import API_URL from '../../config/api';
 
 const AddSpotModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ const AddSpotModal = ({ isOpen, onClose }) => {
       }
 
       // Envoyer la requête avec le token
-      const response = await fetch('http://localhost:4000/api/spots', {
+      const response = await fetch(`${API_URL}/api/spots`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

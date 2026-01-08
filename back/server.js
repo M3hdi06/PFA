@@ -12,8 +12,15 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 const app = express();
 const port = process.env.PORT || 4000;
 
+// Configuration CORS pour accepter le frontend
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Connexion à MongoDB (optionnelle)
 if (process.env.MONGO_URI) {
