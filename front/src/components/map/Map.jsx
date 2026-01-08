@@ -173,7 +173,12 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       const response = await fetch('http://localhost:4000/api/spots');
       if (response.ok) {
         const data = await response.json();
-        setSpots(data.data || []);
+        // Map _id to id for frontend compatibility
+        const spotsWithId = (data.data || []).map(spot => ({
+          ...spot,
+          id: spot._id
+        }));
+        setSpots(spotsWithId);
       } else {
         console.error('Failed to fetch spots:', response.status, response.statusText);
       }
@@ -275,10 +280,14 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       });
 
       if (response.ok) {
-        setSpots(prev => prev.filter(s => s.id !== spotId));
+        setSpots(prev => prev.filter(s => s.id !== spotId && s._id !== spotId));
+        alert('Spot supprimé avec succès!');
+      } else {
+        alert('Erreur lors de la suppression');
       }
     } catch (error) {
       console.error('Error deleting spot:', error);
+      alert('Erreur de connexion');
     }
   };
 
