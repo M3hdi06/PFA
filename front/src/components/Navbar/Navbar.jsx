@@ -55,7 +55,7 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <span className="navbar__logo-dot" />
-          prepfa
+          MapSpot
         </Link>
 
         {/* Toggle mobile */}
