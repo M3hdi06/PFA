@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
 import { CATEGORIES } from "../../constants/categories";
+import API_URL from "../../config/api";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -170,7 +171,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
   const fetchSpots = async () => {
     try {
       // Récupérer tous les spots
-      const response = await fetch('http://localhost:4000/api/spots');
+      const response = await fetch(`${API_URL}/api/spots`);
       if (response.ok) {
         const data = await response.json();
         // Map _id to id and nom to name for frontend compatibility
@@ -218,7 +219,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/spots', {
+      const response = await fetch(`${API_URL}/api/spots`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -274,7 +275,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/api/spots/${spotId}`, {
+      const response = await fetch(`${API_URL}/api/spots/${spotId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
