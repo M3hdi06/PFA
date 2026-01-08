@@ -293,6 +293,20 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
     }
   };
 
+  const handleLikeSpot = (spotId) => {
+    setSpots(prev =>
+      prev.map(s =>
+        s.id === spotId
+          ? { 
+              ...s, 
+              likes: s.liked ? (s.likes > 0 ? s.likes - 1 : 0) : (s.likes == 0 ? s.likes + 1 : 1),
+              liked: true
+            }
+          : s
+      )
+    );
+  };
+
   // Centre par défaut global si pas de position utilisateur
   const center = userPosition ? [userPosition.lat, userPosition.lng] : [20, 0];
 
@@ -343,6 +357,17 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
                 {spot.category && <p className="spot-category">📍 {spot.category}</p>}
                 {spot.createdByName && <p className="spot-creator">👤 {spot.createdByName}</p>}
                 {spot.description && <p>{spot.description}</p>}
+
+                {/* Like button */}
+                <div className="spot-like">
+                  <button 
+                    onClick={() => handleLikeSpot(spot.id)} 
+                    className={`like-btn ${spot.liked ? 'liked' : ''}`}
+                  >
+                    ❤️ {spot.likes || 0}
+                  </button>
+                </div>
+
                 <button 
                   onClick={() => handleDeleteSpot(spot.id)}
                   className="delete-spot-btn"
@@ -351,6 +376,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
                 </button>
               </div>
             </Popup>
+
           </Marker>
         ))}
       </MapContainer>
