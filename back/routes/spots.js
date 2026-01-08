@@ -17,6 +17,29 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET trending spots (top 5) - DOIT ÊTRE AVANT /:id
+router.get("/trending/top", async (req, res) => {
+  try {
+    const spots = await Spot.find().sort({ createdAt: -1 });
+    
+    const trendingSpots = spots
+      .map(spot => ({
+        ...spot.toObject(),
+        likesCount: spot.likes ? spot.likes.length : 0
+      }))
+      .sort((a, b) => b.likesCount - a.likesCount)
+      .slice(0, 5);
+
+    res.status(200).json({
+      success: true,
+      count: trendingSpots.length,
+      data: trendingSpots
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erreur serveur", error: error.message });
+  }
+});
+
 // GET one spot by id
 router.get("/:id", async (req, res) => {
   try {
@@ -166,29 +189,6 @@ router.delete("/:id/like", authMiddleware, async (req, res) => {
       success: true, 
       message: "Like retiré", 
       likesCount: spot.likes.length 
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Erreur serveur", error: error.message });
-  }
-});
-
-// GET trending spots (top 5)
-router.get("/trending/top", async (req, res) => {
-  try {
-    const spots = await Spot.find().sort({ createdAt: -1 });
-    
-    const trendingSpots = spots
-      .map(spot => ({
-        ...spot.toObject(),
-        likesCount: spot.likes ? spot.likes.length : 0
-      }))
-      .sort((a, b) => b.likesCount - a.likesCount)
-      .slice(0, 5);
-
-    res.status(200).json({
-      success: true,
-      count: trendingSpots.length,
-      data: trendingSpots
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Erreur serveur", error: error.message });
