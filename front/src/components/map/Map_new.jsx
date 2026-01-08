@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
+import React, { useEffect, useState, useRef, useImperativeHandle } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
+import { CATEGORIES } from "../../constants/categories";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -16,7 +17,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // Créer des icônes colorées avec le nom du spot
-const createCategoryIcon = (category, name) => {
+const createCategoryIcon = (category = "", name = "") => {
   const colors = {
     café: '#8B4513',
     pâtisserie: '#FFB6C1',
@@ -69,16 +70,57 @@ const createCategoryIcon = (category, name) => {
   });
 };
 
-const Map = ({ filteredSpots = [] }) => {
+// Map click handler component
+const MapClickHandler = ({ onMapClick, isMarkingMode }) => {
+  useMapEvents({
+    click: (e) => {
+      if (isMarkingMode) onMapClick(e.latlng);
+    },
+  });
+  return null;
+};
+
+const Map = React.forwardRef(({ filteredSpots = [], searchQuery = "", filters = {} }, ref) => {
   const [userPosition, setUserPosition] = useState(null);
   const [geoError, setGeoError] = useState(null);
   const [geoStatus, setGeoStatus] = useState("pending");
   const [center, setCenter] = useState([31.7917, -7.0926]);
   const [zoom, setZoom] = useState(6);
+  const [spots, setSpots] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [formData, setFormData] = useState({ name: '', description: '', category: 'Restaurants' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isMarkingMode, setIsMarkingMode] = useState(false);
   const mapRef = useRef(null);
 
-  // TOUS les spots
-  const allSpots = [
+  useImperativeHandle(ref, () => ({
+    enableMarkingMode: () => setIsMarkingMode(true),
+    disableMarkingMode: () => setIsMarkingMode(false),
+  }));
+
+  // Load spots from backend on mount
+  useEffect(() => {
+    fetchSpots();
+  }, []);
+
+  const fetchSpots = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/spots/public');
+      if (response.ok) {
+        const data = await response.json();
+        setSpots(data.spots || []);
+      } else {
+        console.error('Failed to fetch spots:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching spots:', error);
+    }
+  };
+
+  // Spots statiques de fallback (si l'API ne fonctionne pas)
+  const fallbackSpots = [
     // CAFÉS FES
     { id: 1, name: 'Café Medina', category: 'café', location: 'Fès', lat: 34.0626, lng: -5.0063 },
     { id: 2, name: 'Café Riad Fes', category: 'café', location: 'Fès', lat: 34.0639, lng: -5.0052 },
@@ -143,7 +185,8 @@ const Map = ({ filteredSpots = [] }) => {
     { id: 48, name: 'Glacier Corniche', category: 'glacier', location: 'Casablanca', lat: 33.5820, lng: -7.6180 },
   ];
 
-  // Afficher TOUS les spots par défaut, ou les spots filtrés si on cherche
+  // Utiliser les spots de l'API, ou les spots filtrés, ou les spots statiques en fallback
+  const allSpots = spots.length > 0 ? spots : fallbackSpots;
   const spotsToDisplay = filteredSpots.length > 0 ? filteredSpots : allSpots;
 
   useEffect(() => {
@@ -186,6 +229,84 @@ const Map = ({ filteredSpots = [] }) => {
     return () => window.removeEventListener("centerMap", handleCenterMap);
   }, []);
 
+  // Gestion du clic sur la carte pour ajouter un spot
+  const handleMapClick = (latlng) => {
+    setSelectedLocation({ lat: latlng.lat, lng: latlng.lng });
+    setShowForm(true);
+    setError(null);
+  };
+
+  // Gestion du formulaire
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Soumission du formulaire d'ajout de spot
+  const handleAddSpot = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.name.trim()) {
+      setError('Le nom du spot est requis');
+      return;
+    }
+
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      setError('Vous devez être connecté pour ajouter un spot');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:4000/api/spots', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          category: formData.category,
+          lat: selectedLocation.lat,
+          lng: selectedLocation.lng
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Ajouter le nouveau spot à la liste locale
+        setSpots(prev => [...prev, data.spot]);
+        setFormData({ name: '', description: '', category: 'Restaurants' });
+        setSelectedLocation(null);
+        setShowForm(false);
+        setError(null);
+        setIsMarkingMode(false);
+      } else {
+        setError(data.error || 'Erreur lors de l\'ajout du spot');
+      }
+    } catch (error) {
+      console.error('Error adding spot:', error);
+      setError(`Erreur: ${error.message || 'Impossible de connecter au serveur'}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fermer le formulaire
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setSelectedLocation(null);
+    setFormData({ name: '', description: '', category: 'Restaurants' });
+    setError(null);
+    setIsMarkingMode(false);
+  };
+
   return (
     <div className="map-screen">
       <MapContainer
@@ -203,6 +324,8 @@ const Map = ({ filteredSpots = [] }) => {
           attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        <MapClickHandler onMapClick={handleMapClick} isMarkingMode={isMarkingMode} />
 
         {/* TOUS les marqueurs avec leurs noms affichés */}
         {spotsToDisplay.map((spot) => (
@@ -241,8 +364,106 @@ const Map = ({ filteredSpots = [] }) => {
         <div className="legend-item"><span>🍕</span> Pizzeria</div>
         <div className="legend-item"><span>🍦</span> Glacier</div>
       </div>
+
+      {/* Formulaire d'ajout de spot */}
+      {showForm && (
+        <div className="spot-form-modal">
+          <div className="spot-form-container">
+            <div className="spot-form-header">
+              <h2>Ajouter un spot</h2>
+              <button className="close-btn" onClick={handleCloseForm}>✕</button>
+            </div>
+
+            {error && <div className="spot-form-error">{error}</div>}
+
+            <form onSubmit={handleAddSpot} className="spot-form">
+              <div className="form-group">
+                <label htmlFor="category">Catégorie *</label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleFormChange}
+                  className="category-select"
+                  disabled={isLoading}
+                >
+                  {CATEGORIES.map((group) => (
+                    <optgroup key={group.group} label={group.group}>
+                      {group.items.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="name">Nom du spot *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  placeholder="Nom du spot"
+                  disabled={isLoading}
+                  autoFocus
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleFormChange}
+                  placeholder="Description optionnelle"
+                  disabled={isLoading}
+                  rows="3"
+                />
+              </div>
+
+              <div className="form-location">
+                <p>📍 Latitude: {selectedLocation?.lat.toFixed(4)}</p>
+                <p>📍 Longitude: {selectedLocation?.lng.toFixed(4)}</p>
+              </div>
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  onClick={handleCloseForm}
+                  className="btn-cancel"
+                  disabled={isLoading}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Ajout en cours...' : 'Ajouter le spot'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Instructions - visible seulement quand le mode marquage est actif */}
+      {!showForm && isMarkingMode && (
+        <div className="map-instructions">
+          💡 Cliquez sur la carte pour ajouter un spot
+          <button className="cancel-marking" onClick={() => setIsMarkingMode(false)} aria-label="Annuler">Annuler</button>
+        </div>
+      )}
     </div>
   );
-};
+});
+
+Map.displayName = "Map";
 
 export default Map;

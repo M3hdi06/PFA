@@ -13,13 +13,26 @@ const Recherche = ({ query = '', onResultsChange = () => {} }) => {
 
   // Filtrer les résultats en temps réel (pas de champ `name` stocké)
   const filteredResults = useMemo(() => {
-    if (!searchInput.trim()) return allSpots;
-
+    if (!searchInput?.trim()) return allSpots || [];
+  
     const lowerQuery = searchInput.toLowerCase();
-    return allSpots.filter(spot =>
-      spot.category.toLowerCase().includes(lowerQuery) ||
-      spot.location.toLowerCase().includes(lowerQuery)
-    );
+  
+    return (allSpots || []).filter(spot => {
+      if (!spot) return false;
+  
+      const category = typeof spot.category === "string"
+        ? spot.category.toLowerCase()
+        : "";
+  
+      const location = typeof spot.location === "string"
+        ? spot.location.toLowerCase()
+        : "";
+  
+      return (
+        category.includes(lowerQuery) ||
+        location.includes(lowerQuery)
+      );
+    });
   }, [searchInput, allSpots]);
 
   // Notifier le parent des résultats filtrés

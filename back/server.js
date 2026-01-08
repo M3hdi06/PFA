@@ -15,11 +15,18 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 app.use(cors());
 
-// Connexion à MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connecté avec succès"))
-  .catch((err) => console.error("❌ Erreur de connexion MongoDB:", err));
+// Connexion à MongoDB (optionnelle)
+if (process.env.MONGO_URI) {
+  mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ MongoDB connecté avec succès"))
+    .catch((err) => {
+      console.error("❌ Erreur de connexion MongoDB:", err.message);
+      console.warn("⚠️  Le serveur continue sans MongoDB. Certaines fonctionnalités peuvent être limitées.");
+    });
+} else {
+  console.warn("⚠️  MONGO_URI non défini. Le serveur fonctionne sans MongoDB.");
+}
 
 // Routes test
 app.get("/", (req, res) => res.send("Hello Amine"));

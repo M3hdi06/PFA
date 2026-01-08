@@ -122,10 +122,21 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       const query = searchQuery.toLowerCase();
       
       // Filter spots that match the search query (in name or description)
-      const matchedSpots = spots.filter(spot => 
-        spot.name.toLowerCase().includes(query) || 
-        (spot.description && spot.description.toLowerCase().includes(query))
-      );
+      const matchedSpots = spots.filter(spot => {
+        const name = typeof spot.name === "string"
+          ? spot.name.toLowerCase()
+          : "";
+      
+        const description = typeof spot.description === "string"
+          ? spot.description.toLowerCase()
+          : "";
+      
+        return (
+          name.includes(query) ||
+          description.includes(query)
+        );
+      });
+      
       
       if (matchedSpots.length > 0) {
         let selectedSpotToShow = matchedSpots[0];
