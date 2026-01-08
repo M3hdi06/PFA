@@ -173,10 +173,11 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       const response = await fetch('http://localhost:4000/api/spots');
       if (response.ok) {
         const data = await response.json();
-        // Map _id to id for frontend compatibility
+        // Map _id to id and nom to name for frontend compatibility
         const spotsWithId = (data.data || []).map(spot => ({
           ...spot,
-          id: spot._id
+          id: spot._id,
+          name: spot.nom || spot.name
         }));
         setSpots(spotsWithId);
       } else {
@@ -236,8 +237,9 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Add new spot to local state
-        setSpots(prev => [...prev, data.data]);
+        // Add new spot to local state with normalized data
+        const newSpot = { ...data.data, id: data.data._id, name: data.data.nom || data.data.name };
+        setSpots(prev => [...prev, newSpot]);
         setFormData({ name: '', description: '', category: 'Restaurants' });
         setSelectedLocation(null);
         setShowForm(false);
