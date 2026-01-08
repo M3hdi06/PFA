@@ -273,6 +273,9 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
     }
 
     try {
+      console.log('Liking spot:', spotId);
+      console.log('API URL:', `${API_URL}/api/spots/${spotId}/like`);
+      
       const response = await fetch(`${API_URL}/api/spots/${spotId}/like`, {
         method: 'POST',
         headers: {
@@ -280,7 +283,9 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
         }
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (response.ok) {
         fetchSpots(); // Recharger les spots
@@ -290,7 +295,7 @@ const Map = React.forwardRef(({ searchQuery = "", filters = {} }, ref) => {
       }
     } catch (error) {
       console.error('Error liking spot:', error);
-      alert('Erreur de connexion');
+      alert(`Erreur de connexion: ${error.message}`);
     }
   };
 
