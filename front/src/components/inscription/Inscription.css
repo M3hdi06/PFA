@@ -4,7 +4,7 @@
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff4500 0%, #764ba2 100%);
 }
 
 /* =====================
@@ -82,7 +82,7 @@ body {
   transition: all 0.3s ease;
   background: #f9fafb;
   color: #111827;
-  caret-color: #6366f1;
+  caret-color: #ff4500;
 }
 
 .form-group input::placeholder {
@@ -91,7 +91,7 @@ body {
 
 .form-group input:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: #ff4500;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
   background: #ffffff;
 }
@@ -142,7 +142,7 @@ body {
   padding: 14px 18px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: linear-gradient(135deg, #ff4500, #4f46e5);
   color: white;
   font-weight: 600;
   font-size: 15px;
@@ -152,7 +152,7 @@ body {
 
 .submit-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99,102,241,0.3);
+  box-shadow: 0 6px 20px rgba(255, 69, 0, 0.3);
 }
 
 .submit-button:disabled {
@@ -171,14 +171,14 @@ body {
 }
 
 .inscription-footer a {
-  color: #6366f1;
+  color: #ff4500;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .inscription-footer a:hover {
-  color: #4f46e5;
+  color: #ff4500;
   text-decoration: underline;
 }
 
@@ -250,7 +250,7 @@ input:-webkit-autofill:focus,
 input:-internal-autofill-selected {
   -webkit-text-fill-color: #111827 !important;
   box-shadow: 0 0 0 1000px #f9fafb inset !important;
-  caret-color: #6366f1;
+  caret-color: #ff4500;
 }
 
 /* =====================

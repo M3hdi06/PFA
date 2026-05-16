@@ -5,6 +5,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
 const spotsRoutes = require("./routes/spots");
+const postsRoutes = require("./routes/posts");
+const commentsRoutes = require("./routes/comments");
 
 // Charger les variables d'environnement
 dotenv.config({ path: path.join(__dirname, ".env") });
@@ -41,6 +43,8 @@ app.get("/", (req, res) => res.send("Hello Amine"));
 // Routes d'authentification et spots
 app.use("/api/auth", authRoutes);
 app.use("/api/spots", spotsRoutes);
+app.use("/api/posts", postsRoutes);
+app.use("/api/comments", commentsRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Server is running on port ${port}`);

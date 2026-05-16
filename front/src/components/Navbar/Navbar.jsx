@@ -22,10 +22,8 @@ const Navbar = () => {
       }
     };
 
-    // Charger au montage
     loadUser();
 
-    // Écouter les événements de connexion/déconnexion
     const handleAuthChange = () => loadUser();
     window.addEventListener('authChange', handleAuthChange);
     window.addEventListener('storage', handleAuthChange);
@@ -48,17 +46,14 @@ const Navbar = () => {
   return (
     <header className="navbar">
       <div className="navbar__container">
-        {/* Brand / Logo */}
         <Link
-          to="/map"
+          to="/home"
           className="navbar__brand"
           onClick={() => setIsOpen(false)}
         >
-          <span className="navbar__logo-dot" />
-          MapSpot
+          <span className="navbar__brand--muz">Muz</span><span className="navbar__brand--ly">ly</span>
         </Link>
 
-        {/* Toggle mobile */}
         <button
           className="navbar__toggle"
           aria-label="Basculer la navigation"
@@ -70,20 +65,7 @@ const Navbar = () => {
           <span />
         </button>
 
-        {/* Navigation */}
         <nav className={`navbar__links ${isOpen ? "is-open" : ""}`}>
-          <Link to="/map" onClick={() => setIsOpen(false)}>
-            Carte
-          </Link>
-
-          <Link to="/favorites" onClick={() => setIsOpen(false)}>
-            Favoris
-          </Link>
-
-          <Link to="/trending" onClick={() => setIsOpen(false)}>
-            Tendances
-          </Link>
-
           {user ? (
             <div className="navbar__user">
               <span className="navbar__username">👤 {user.nom || user.email}</span>
