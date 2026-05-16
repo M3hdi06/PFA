@@ -1,7 +1,9 @@
 .home-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  height: calc(100dvh - 6.5rem);
+  max-height: calc(100dvh - 6.5rem);
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
 }
@@ -52,7 +54,8 @@
 .home-columns {
   display: flex;
   flex: 1;
-  height: calc(100vh - 98px);
+  min-height: 0;
+  overflow: hidden;
   gap: 0;
   flex-wrap: nowrap;
   transition: all 0.3s ease;
@@ -62,7 +65,6 @@
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
@@ -81,6 +83,19 @@
 
 .home-column--left {
   padding: 20px;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.home-column--left::-webkit-scrollbar {
+  display: none;
 }
 
 .publier {
