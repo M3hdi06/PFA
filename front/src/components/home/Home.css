@@ -304,9 +304,33 @@
 
 .publication-likes {
   align-self: flex-end;
-  margin: 0 !important;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 69, 0, 0.25);
+  border-radius: 999px;
+  background: #ffffff;
   font-weight: 700;
-  color: var(--accent) !important;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.publication-likes:hover {
+  background: rgba(255, 69, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.publication-likes--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.publication-likes--active:hover {
+  background: #e63e00;
+  border-color: #e63e00;
 }
 
 .home-column--left,

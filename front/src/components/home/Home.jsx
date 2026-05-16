@@ -26,6 +26,11 @@ const getStoredUser = () => {
 
 const getUserId = (user) => user?._id || user?.id;
 
+const hasUserLikedPost = (post, userId) => {
+  if (!userId || !post?.likes?.length) return false;
+  return post.likes.some((id) => id.toString() === userId.toString());
+};
+
 
 
 const formatDate = (dateStr) => {
@@ -214,6 +219,36 @@ const Home = () => {
 
 
 
+  const handleToggleLike = async (post) => {
+    const token = localStorage.getItem('authToken');
+    const userId = getUserId(currentUser);
+
+    if (!token || !userId) {
+      alert('Connectez-vous pour liker une publication.');
+      return;
+    }
+
+    const alreadyLiked = hasUserLikedPost(post, userId);
+
+    try {
+      const response = await fetch(`${API_URL}/api/posts/${post._id}/like`, {
+        method: alreadyLiked ? 'DELETE' : 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setPosts((prev) =>
+          prev.map((p) => (p._id === post._id ? data.data : p))
+        );
+      } else {
+        alert(data.message || 'Erreur lors du like');
+      }
+    } catch {
+      alert('Erreur de connexion au serveur.');
+    }
+  };
+
   const handleCommentSubmit = async (post) => {
 
     const userId = getUserId(currentUser);
@@ -339,8 +374,10 @@ const Home = () => {
           {posts.map((post) => {
 
             const comments = commentsByPost[post._id] || [];
-
             const authorName = post.userId?.nom || 'Utilisateur';
+            const userId = getUserId(currentUser);
+            const isLiked = hasUserLikedPost(post, userId);
+            const likesCount = post.likes?.length || 0;
 
 
 
@@ -434,11 +471,14 @@ const Home = () => {
 
 
 
-                <p className="publication-likes">
-
-                  {post.likes?.length || 0} j&apos;aime
-
-                </p>
+                <button
+                  type="button"
+                  className={`publication-likes ${isLiked ? 'publication-likes--active' : ''}`}
+                  onClick={() => handleToggleLike(post)}
+                  aria-pressed={isLiked}
+                >
+                  {isLiked ? '♥' : '♡'} {likesCount} j&apos;aime
+                </button>
 
               </div>
 
