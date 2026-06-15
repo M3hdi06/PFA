@@ -360,7 +360,7 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
                 onClick={() => setIsPostModalOpen(false)}
                 aria-label="Fermer"
               >
-                ×
+                
               </button>
             </div>
 
