@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import API_URL from '../../config/api';
-import PostModal from './PostModal';
 import './ProfilePanel.css';
 
 /* ─── Icons ───────────────────────────────────────── */
@@ -340,16 +339,6 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
           </div>
         </button>
       </div>
-
-      <PostModal
-        isOpen={isPostModalOpen}
-        postText={postText}
-        isPosting={isPosting}
-        postMessage={postMessage}
-        onClose={() => setIsPostModalOpen(false)}
-        onChangeText={setPostText}
-        onSubmit={handlePost}
-      />
 
     </aside>
   );

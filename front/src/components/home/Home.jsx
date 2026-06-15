@@ -4,7 +4,7 @@ import './Home.css';
 
 import API_URL from '../../config/api';
 
-
+import ProfilePanel from '../profile/ProfilePanel';
 
 const getStoredUser = () => {
 
@@ -496,13 +496,13 @@ const Home = () => {
 
         </div>
 
-        <div className="home-column home-column--right">
-
-          <h2>Colonne 3</h2>
-
-          <p>Contenu de la colonne droite.</p>
-
-        </div>
+        <div className="home-column home-column--right home-column--profile">
+  <ProfilePanel
+    user={currentUser}
+    onUserUpdate={(u) => setCurrentUser(u)}
+    onPostCreated={(newPost) => setPosts((prev) => [newPost, ...prev])}
+  />
+</div>
 
       </div>
 
