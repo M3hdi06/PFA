@@ -185,7 +185,7 @@
   flex: 1;
   border: none;
   background: transparent;
-  color: #000000;
+  color: var(--text);
   font-size: 0.95rem;
   outline: none;
   padding: 0;
@@ -208,11 +208,6 @@
 .navbar__search-btn:hover {
   color: var(--accent);
   transform: scale(1.15);
-}
-
-.navbar__search-icon {
-  width: 18px;
-  height: 18px;
 }
 
 @media (max-width: 900px) {

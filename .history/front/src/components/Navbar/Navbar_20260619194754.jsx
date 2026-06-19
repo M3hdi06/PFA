@@ -44,14 +44,6 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery("");
-    }
-  };
-
   return (
     <header className="navbar">
       <div className="navbar__container">
@@ -62,23 +54,6 @@ const Navbar = () => {
         >
           <span className="navbar__brand--muz">Muz</span><span className="navbar__brand--ly">ly</span>
         </Link>
-
-        <form className="navbar__search" onSubmit={handleSearch}>
-          <input
-            type="text"
-            className="navbar__search-input"
-            placeholder="Rechercher un musicien ou un investisseur"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Rechercher"
-          />
-          <button type="submit" className="navbar__search-btn" aria-label="Valider la recherche">
-            <svg className="navbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-          </button>
-        </form>
 
         <button
           className="navbar__toggle"

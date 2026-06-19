@@ -73,10 +73,7 @@ const Navbar = () => {
             aria-label="Rechercher"
           />
           <button type="submit" className="navbar__search-btn" aria-label="Valider la recherche">
-            <svg className="navbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
+            🔍
           </button>
         </form>
 

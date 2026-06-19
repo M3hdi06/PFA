@@ -185,7 +185,7 @@
   flex: 1;
   border: none;
   background: transparent;
-  color: #000000;
+  color: var(--text);
   font-size: 0.95rem;
   outline: none;
   padding: 0;
