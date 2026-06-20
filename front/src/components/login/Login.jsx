@@ -173,7 +173,7 @@ const Login = () => {
           </form>
 
           <p className="login__footer">
-            Nouveau sur prepfa ?{" "}
+            Nouveau sur Muzly ?{" "}
             <Link className="link" to="/inscription">
               Créer un compte
             </Link>

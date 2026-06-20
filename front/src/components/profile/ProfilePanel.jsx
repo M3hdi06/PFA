@@ -52,6 +52,46 @@ const getInitials = (nom, email) => {
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return source.slice(0, 2).toUpperCase();
 };
+
+const formatRoleHashtag = (role) => {
+  if (!role) return '';
+
+  const map = {
+    Browser: '#browser',
+    Musician: '#musician',
+    Band: '#band',
+    Investor: '#investors',
+  };
+
+  return map[role] || `#${String(role).toLowerCase()}`;
+};
+
+const formatStatusHashtag = (status) => {
+  if (!status) return '';
+
+  if (status === 'complete') return '#dontseache';
+  if (status === 'wantMembers') return '#searchforothers';
+  return `#${String(status).toLowerCase()}`;
+};
+
+const getUserGroupStatus = (user) => {
+  if (user?.groupStatus) return user.groupStatus;
+  if (user?.searchGoal) return user.searchGoal;
+  if (user?.role === 'Investor') return 'complete';
+  if (user?.role === 'Band' || user?.role === 'Musician') return 'wantMembers';
+  return '';
+};
+
+const getUserDisplayGenres = (user) => {
+  if (!Array.isArray(user?.genres)) return [];
+  return user.genres;
+};
+
+const getUserProfileOptions = (user) => {
+  if (!Array.isArray(user?.profileOptions)) return [];
+  return user.profileOptions;
+};
+
 const formatHashtag = (genre) => {
   if (!genre) return '';
   const normalized = genre
@@ -279,11 +319,52 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
                 </li>
               </ul>
 
+              <div className="profile-panel__subsection">
+                <h4 className="profile-panel__hashtags-title">Role</h4>
+                <div className="profile-panel__hashtags-list">
+                  <span className="profile-panel__hashtag-pill">
+                    {formatRoleHashtag(user.role)}
+                  </span>
+                </div>
+              </div>
+
+              {(user.role === 'Musician' || user.role === 'Band' || user.role === 'Investor' || getUserGroupStatus(user)) && (
+                <div className="profile-panel__subsection">
+                  <h4 className="profile-panel__hashtags-title">Do I searche for</h4>
+                  <div className="profile-panel__hashtags-list">
+                    <span className="profile-panel__hashtag-pill">
+                      {formatStatusHashtag(getUserGroupStatus(user)) || '#searchforothers'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {(user.role === 'Musician' || user.role === 'Band' || user.role === 'Investor') && (
+                <div className="profile-panel__subsection">
+                  <h4 className="profile-panel__hashtags-title">
+                    {user.role === 'Musician' ? 'What do I do?' : 'What am I searching for?'}
+                  </h4>
+                  <div className="profile-panel__hashtags-list">
+                    {getUserProfileOptions(user).length > 0 ? (
+                      getUserProfileOptions(user).map((option) => (
+                        <span key={option} className="profile-panel__hashtag-pill">
+                          {option}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="profile-panel__hashtag-empty">
+                        Aucune option sélectionnée.
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="profile-panel__hashtags-section">
                 <h4 className="profile-panel__hashtags-title">Genres préférés</h4>
                 <div className="profile-panel__hashtags-list">
-                  {Array.isArray(user.genres) && user.genres.length > 0 ? (
-                    user.genres.map((genre) => (
+                  {getUserDisplayGenres(user).length > 0 ? (
+                    getUserDisplayGenres(user).map((genre) => (
                       <span key={genre} className="profile-panel__hashtag-pill">
                         {formatHashtag(genre)}
                       </span>

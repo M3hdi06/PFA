@@ -180,47 +180,48 @@ const genreGroups = [
 ];
 
 const roleOptions = [
-  "Browser",
-  "Musician",
-  "Band",
-  "Investor",
+  { value: "Browser", label: "#browser" },
+  { value: "Musician", label: "#musician" },
+  { value: "Band", label: "#band" },
+  { value: "Investor", label: "#investors" },
 ];
 
 const roleProfileOptions = {
   Musician: [
-    "Guitarist",
-    "Singer",
-    "Drummer",
-    "Bassist",
-    "Pianist",
-    "Producer",
-    "Songwriter",
-    "DJ",
-    "Multi-instrumentalist",
+    "#guitarist",
+    "#singer",
+    "#drummer",
+    "#bassist",
+    "#pianist",
+    "#producer",
+    "#songwriter",
+    "#dj",
+    "#multi-instrumentalist",
   ],
   Investor: [
-    "Guitarist",
-    "Band",
-    "Musician",
-    "Singer",
-    "Drummer",
-    "Bassist",
-    "Pianist",
-    "Producer",
-    "DJ",
+    "#investors",
+    "#band",
+    "#musician",
+    "#singer",
+    "#drummer",
+    "#bassist",
+    "#pianist",
+    "#producer",
+    "#dj",
   ],
+  Band: ["#band"],
 };
 
-const searchGoalOptions = [
+const groupStatusOptions = [
   {
     value: "complete",
-    label: "I’m complete",
-    description: "Je ne cherche pas d'autres musiciens.",
+    label: "#dontseache",
+    description: "Le groupe est complet.",
   },
   {
-    value: "wantComplete",
-    label: "I want to complete",
-    description: "Je cherche d'autres musiciens ou groupes.",
+    value: "wantMembers",
+    label: "#searchforothers",
+    description: "Le groupe cherche encore des membres.",
   },
 ];
 
@@ -242,7 +243,7 @@ const Inscription = () => {
   const [onboardingStep, setOnboardingStep] = useState('role');
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedProfileOptions, setSelectedProfileOptions] = useState([]);
-  const [selectedSearchGoal, setSelectedSearchGoal] = useState('');
+  const [selectedGroupStatus, setSelectedGroupStatus] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -283,7 +284,6 @@ const Inscription = () => {
     return newErrors;
   };
 
-  const isProfileStep = selectedRole === "Musician" || selectedRole === "Investor";
   const isSearchGoalStep = selectedRole === "Band" || selectedRole === "Musician";
 
   const handleSubmit = (e) => {
@@ -301,14 +301,14 @@ const Inscription = () => {
     setOnboardingStep("role");
     setSelectedRole("");
     setSelectedProfileOptions([]);
-    setSelectedSearchGoal("");
+    setSelectedGroupStatus("");
     setSelectedGenres([]);
   };
 
   const selectRole = (role) => {
     setSelectedRole(role);
     setSelectedProfileOptions([]);
-    setSelectedSearchGoal("");
+    setSelectedGroupStatus("");
     setGenreError("");
 
     if (role === "Browser" || role === "Band") {
@@ -344,7 +344,7 @@ const Inscription = () => {
   };
 
   const selectSearchGoal = (goal) => {
-    setSelectedSearchGoal(goal);
+    setSelectedGroupStatus(goal);
     setGenreError("");
   };
 
@@ -353,7 +353,7 @@ const Inscription = () => {
     setOnboardingStep("role");
     setSelectedRole("");
     setSelectedProfileOptions([]);
-    setSelectedSearchGoal("");
+    setSelectedGroupStatus("");
     setSelectedGenres([]);
     setGenreError("");
   };
@@ -397,7 +397,7 @@ const Inscription = () => {
           genres: selectedGenres,
           role: selectedRole,
           profileOptions: selectedProfileOptions,
-          searchGoal: selectedSearchGoal,
+          groupStatus: selectedGroupStatus,
         }),
       });
 
@@ -505,15 +505,15 @@ const Inscription = () => {
                 <div className="modal-header">
                   <h3>
                     {onboardingStep === "role" && "Who am I?"}
-                    {onboardingStep === "profileOptions" && (selectedRole === "Musician" ? "What do you do?" : "What are you searching for?")}
+                    {onboardingStep === "profileOptions" && (selectedRole === "Musician" ? "What do I do?" : "What are you searching for?")}
                     {onboardingStep === "genre" && (selectedRole === "Browser" ? "What’s your taste?" : "What kind?")}
-                    {onboardingStep === "searchGoal" && "What are you searching for?"}
+                    {onboardingStep === "searchGoal" && "Do I search?"}
                   </h3>
                   <p>
                     {onboardingStep === "role" && "Choisissez votre rôle pour personnaliser le reste de l'onboarding."}
                     {onboardingStep === "profileOptions" && "Sélectionnez toutes les options qui correspondent à votre profil."}
                     {onboardingStep === "genre" && "Sélectionnez jusqu'à 5 styles musicaux."}
-                    {onboardingStep === "searchGoal" && "Choisissez ce que vous recherchez après avoir choisi vos genres."}
+                    {onboardingStep === "searchGoal" && "Choisissez si votre groupe est complet ou recherche encore des membres."}
                   </p>
                 </div>
 
@@ -523,12 +523,12 @@ const Inscription = () => {
                   <div className="options-grid">
                     {roleOptions.map((role) => (
                       <button
-                        key={role}
+                        key={role.value}
                         type="button"
-                        className={`option-pill ${selectedRole === role ? "selected" : ""}`}
-                        onClick={() => selectRole(role)}
+                        className={`option-pill ${selectedRole === role.value ? "selected" : ""}`}
+                        onClick={() => selectRole(role.value)}
                       >
-                        {role}
+                        {role.label}
                       </button>
                     ))}
                   </div>
@@ -588,11 +588,11 @@ const Inscription = () => {
 
                 {onboardingStep === "searchGoal" && (
                   <div className="options-grid">
-                    {searchGoalOptions.map((option) => (
+                    {groupStatusOptions.map((option) => (
                       <button
                         key={option.value}
                         type="button"
-                        className={`option-card ${selectedSearchGoal === option.value ? "selected" : ""}`}
+                        className={`option-card ${selectedGroupStatus === option.value ? "selected" : ""}`}
                         onClick={() => selectSearchGoal(option.value)}
                       >
                         <strong>{option.label}</strong>
@@ -651,7 +651,7 @@ const Inscription = () => {
                       type="button"
                       className="btn-primary"
                       onClick={submitRegistration}
-                      disabled={!selectedSearchGoal || isLoading}
+                      disabled={!selectedGroupStatus || isLoading}
                     >
                       {isLoading ? "Enregistrement..." : "Valider et créer le compte"}
                     </button>

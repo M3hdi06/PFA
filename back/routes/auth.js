@@ -8,7 +8,7 @@ const router = express.Router();
 // @POST /api/auth/register
 router.post("/register", async (req, res) => {
   try {
-    const { nom, email, password, genres, role, profileOptions, searchGoal } = req.body;
+    const { nom, email, password, genres, role, profileOptions, searchGoal, groupStatus } = req.body;
     if (!nom || !email || !password) {
       return res.status(400).json({ success: false, message: "Tous les champs sont requis" });
     }
@@ -25,7 +25,9 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ success: false, message: "Options de profil invalides" });
     }
 
-    if (searchGoal && !["complete", "wantComplete"].includes(searchGoal)) {
+    const normalizedGroupStatus = groupStatus ?? searchGoal;
+
+    if (normalizedGroupStatus && !["complete", "wantMembers"].includes(normalizedGroupStatus)) {
       return res.status(400).json({ success: false, message: "Objectif de recherche invalide" });
     }
 
@@ -46,7 +48,7 @@ router.post("/register", async (req, res) => {
         : [],
       role: role || "Browser",
       profileOptions: Array.isArray(profileOptions) ? profileOptions : [],
-      searchGoal: searchGoal || "",
+      groupStatus: normalizedGroupStatus,
     });
     await user.save();
 
@@ -63,7 +65,7 @@ router.post("/register", async (req, res) => {
         genres: user.genres,
         role: user.role,
         profileOptions: user.profileOptions,
-        searchGoal: user.searchGoal,
+        groupStatus: user.groupStatus,
       }
     });
   } catch (error) {
@@ -98,7 +100,7 @@ router.post("/login", async (req, res) => {
         genres: user.genres,
         role: user.role,
         profileOptions: user.profileOptions,
-        searchGoal: user.searchGoal,
+        groupStatus: user.groupStatus,
       }
     });
   } catch (error) {
@@ -128,7 +130,7 @@ router.get("/me", async (req, res) => {
         genres: user.genres,
         role: user.role,
         profileOptions: user.profileOptions,
-        searchGoal: user.searchGoal,
+        groupStatus: user.groupStatus,
       }
     });
   } catch (error) {

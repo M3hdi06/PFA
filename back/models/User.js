@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const GROUP_STATUS = ["complete", "wantMembers"];
+
 const userSchema = new mongoose.Schema({
   nom: {
     type: String,
@@ -30,10 +32,23 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
-  searchGoal: {
+  groupStatus: {
     type: String,
-    enum: ["complete", "wantComplete"],
-    default: ""
+    enum: GROUP_STATUS,
+    default: function () {
+      return this.role === "Investor" ? "complete" : "wantMembers";
+    },
+    validate: {
+      validator: function (value) {
+        if (this.role === "Investor") {
+          return value === "complete";
+        }
+
+        return GROUP_STATUS.includes(value);
+      },
+      message: "groupStatus invalide"
+    },
+    alias: "searchGoal"
   },
   createdAt: {
     type: Date,
