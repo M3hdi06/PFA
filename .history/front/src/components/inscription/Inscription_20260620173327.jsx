@@ -179,51 +179,6 @@ const genreGroups = [
   },
 ];
 
-const roleOptions = [
-  "Browser",
-  "Musician",
-  "Band",
-  "Investor",
-];
-
-const roleProfileOptions = {
-  Musician: [
-    "Guitarist",
-    "Singer",
-    "Drummer",
-    "Bassist",
-    "Pianist",
-    "Producer",
-    "Songwriter",
-    "DJ",
-    "Multi-instrumentalist",
-  ],
-  Investor: [
-    "Guitarist",
-    "Band",
-    "Musician",
-    "Singer",
-    "Drummer",
-    "Bassist",
-    "Pianist",
-    "Producer",
-    "DJ",
-  ],
-};
-
-const searchGoalOptions = [
-  {
-    value: "complete",
-    label: "I’m complete",
-    description: "Je ne cherche pas d'autres musiciens.",
-  },
-  {
-    value: "wantComplete",
-    label: "I want to complete",
-    description: "Je cherche d'autres musiciens ou groupes.",
-  },
-];
-
 const Inscription = () => {
   const navigate = useNavigate();
 
@@ -283,9 +238,6 @@ const Inscription = () => {
     return newErrors;
   };
 
-  const isProfileStep = selectedRole === "Musician" || selectedRole === "Investor";
-  const isSearchGoalStep = selectedRole === "Band" || selectedRole === "Musician";
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -297,25 +249,7 @@ const Inscription = () => {
 
     setErrors({});
     setGenreError("");
-    setShowOnboarding(true);
-    setOnboardingStep("role");
-    setSelectedRole("");
-    setSelectedProfileOptions([]);
-    setSelectedSearchGoal("");
-    setSelectedGenres([]);
-  };
-
-  const selectRole = (role) => {
-    setSelectedRole(role);
-    setSelectedProfileOptions([]);
-    setSelectedSearchGoal("");
-    setGenreError("");
-
-    if (role === "Browser" || role === "Band") {
-      setOnboardingStep("genre");
-    } else {
-      setOnboardingStep("profileOptions");
-    }
+    setShowGenrePopup(true);
   };
 
   const toggleGenre = (genre) => {
@@ -333,55 +267,17 @@ const Inscription = () => {
     setGenreError("");
   };
 
-  const toggleProfileOption = (option) => {
-    if (selectedProfileOptions.includes(option)) {
-      setSelectedProfileOptions((prev) => prev.filter((item) => item !== option));
-      return;
-    }
-
-    setSelectedProfileOptions((prev) => [...prev, option]);
+  const closeGenrePopup = () => {
+    setShowGenrePopup(false);
     setGenreError("");
   };
 
-  const selectSearchGoal = (goal) => {
-    setSelectedSearchGoal(goal);
-    setGenreError("");
-  };
-
-  const closeOnboarding = () => {
-    setShowOnboarding(false);
-    setOnboardingStep("role");
-    setSelectedRole("");
-    setSelectedProfileOptions([]);
-    setSelectedSearchGoal("");
-    setSelectedGenres([]);
-    setGenreError("");
-  };
-
-  const handleContinueFromProfile = () => {
-    if (!selectedProfileOptions.length) {
-      setGenreError("Sélectionnez au moins une option pour continuer.");
-      return;
-    }
-
-    setOnboardingStep("genre");
-  };
-
-  const handleContinueFromGenre = () => {
+  const handleGenreSubmit = async () => {
     if (selectedGenres.length === 0) {
       setGenreError("Choisissez au moins un genre musical.");
       return;
     }
 
-    if (isSearchGoalStep) {
-      setOnboardingStep("searchGoal");
-      return;
-    }
-
-    submitRegistration();
-  };
-
-  const submitRegistration = async () => {
     setIsLoading(true);
     setErrors({});
     setGenreError("");
@@ -395,16 +291,13 @@ const Inscription = () => {
           email: formData.email,
           password: formData.password,
           genres: selectedGenres,
-          role: selectedRole,
-          profileOptions: selectedProfileOptions,
-          searchGoal: selectedSearchGoal,
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setShowOnboarding(false);
+        setShowGenrePopup(false);
         navigate("/login");
       } else {
         setErrors({ submit: data.message || data.error || "Erreur d'inscription" });
@@ -499,163 +392,58 @@ const Inscription = () => {
             </button>
           </form>
 
-          {showOnboarding && (
+          {showGenrePopup && (
             <div className="modal-overlay">
               <div className="modal-card">
                 <div className="modal-header">
-                  <h3>
-                    {onboardingStep === "role" && "Who am I?"}
-                    {onboardingStep === "profileOptions" && (selectedRole === "Musician" ? "What do you do?" : "What are you searching for?")}
-                    {onboardingStep === "genre" && (selectedRole === "Browser" ? "What’s your taste?" : "What kind?")}
-                    {onboardingStep === "searchGoal" && "What are you searching for?"}
-                  </h3>
-                  <p>
-                    {onboardingStep === "role" && "Choisissez votre rôle pour personnaliser le reste de l'onboarding."}
-                    {onboardingStep === "profileOptions" && "Sélectionnez toutes les options qui correspondent à votre profil."}
-                    {onboardingStep === "genre" && "Sélectionnez jusqu'à 5 styles musicaux."}
-                    {onboardingStep === "searchGoal" && "Choisissez ce que vous recherchez après avoir choisi vos genres."}
-                  </p>
+                  <h3>Choisissez vos genres musicaux</h3>
+                  <p>Sélectionnez jusqu'à 5 styles différents.</p>
                 </div>
 
                 {genreError && <div className="error-message">{genreError}</div>}
 
-                {onboardingStep === "role" && (
-                  <div className="options-grid">
-                    {roleOptions.map((role) => (
-                      <button
-                        key={role}
-                        type="button"
-                        className={`option-pill ${selectedRole === role ? "selected" : ""}`}
-                        onClick={() => selectRole(role)}
-                      >
-                        {role}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {onboardingStep === "profileOptions" && (
-                  <>
-                    <div className="options-grid">
-                      {(roleProfileOptions[selectedRole] || []).map((option) => {
-                        const selected = selectedProfileOptions.includes(option);
-                        return (
-                          <button
-                            key={option}
-                            type="button"
-                            className={`option-pill ${selected ? "selected" : ""}`}
-                            onClick={() => toggleProfileOption(option)}
-                          >
-                            {option}
-                          </button>
-                        );
-                      })}
+                <div className="genres-grid">
+                  {genreGroups.map((group) => (
+                    <div className="genre-group" key={group.title}>
+                      <div className="genre-group-header">
+                        <span className="genre-group-number">{genreGroups.indexOf(group) + 1}.</span>
+                        <h4>{group.title}</h4>
+                      </div>
+                      <div className="genre-group-items">
+                        {group.genres.map((genre) => {
+                          const selected = selectedGenres.includes(genre);
+                          return (
+                            <button
+                              key={genre}
+                              type="button"
+                              className={`genre-pill ${selected ? "selected" : ""}`}
+                              onClick={() => toggleGenre(genre)}
+                            >
+                              {genre}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <p className="genre-note">Sélection libre — aucun maximum.</p>
-                  </>
-                )}
+                  ))}
+                </div>
 
-                {onboardingStep === "genre" && (
-                  <>
-                    <div className="genres-grid">
-                      {genreGroups.map((group) => (
-                        <div className="genre-group" key={group.title}>
-                          <div className="genre-group-header">
-                            <span className="genre-group-number">{genreGroups.indexOf(group) + 1}.</span>
-                            <h4>{group.title}</h4>
-                          </div>
-                          <div className="genre-group-items">
-                            {group.genres.map((genre) => {
-                              const selected = selectedGenres.includes(genre);
-                              return (
-                                <button
-                                  key={genre}
-                                  type="button"
-                                  className={`genre-pill ${selected ? "selected" : ""}`}
-                                  onClick={() => toggleGenre(genre)}
-                                >
-                                  {genre}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="genre-note">Genres choisis : {selectedGenres.length} / 5</p>
-                  </>
-                )}
-
-                {onboardingStep === "searchGoal" && (
-                  <div className="options-grid">
-                    {searchGoalOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        className={`option-card ${selectedSearchGoal === option.value ? "selected" : ""}`}
-                        onClick={() => selectSearchGoal(option.value)}
-                      >
-                        <strong>{option.label}</strong>
-                        <span>{option.description}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <p className="genre-note">
+                  Genres choisis : {selectedGenres.length} / 5
+                </p>
 
                 <div className="modal-actions">
-                  <button type="button" className="btn-secondary" onClick={closeOnboarding}>
+                  <button type="button" className="btn-secondary" onClick={closeGenrePopup}>
                     Annuler
                   </button>
-                  {onboardingStep === "role" && (
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      onClick={() => {
-                        if (!selectedRole) {
-                          setGenreError("Veuillez choisir un rôle pour continuer.");
-                          return;
-                        }
-                        if (selectedRole === "Browser" || selectedRole === "Band") {
-                          setOnboardingStep("genre");
-                        } else {
-                          setOnboardingStep("profileOptions");
-                        }
-                      }}
-                      disabled={isLoading}
-                    >
-                      Continuer
-                    </button>
-                  )}
-                  {onboardingStep === "profileOptions" && (
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      onClick={handleContinueFromProfile}
-                      disabled={isLoading}
-                    >
-                      Continuer
-                    </button>
-                  )}
-                  {onboardingStep === "genre" && (
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      onClick={handleContinueFromGenre}
-                      disabled={isLoading}
-                    >
-                      {isSearchGoalStep ? "Suivant" : isLoading ? "Enregistrement..." : "Valider et créer le compte"}
-                    </button>
-                  )}
-                  {onboardingStep === "searchGoal" && (
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      onClick={submitRegistration}
-                      disabled={!selectedSearchGoal || isLoading}
-                    >
-                      {isLoading ? "Enregistrement..." : "Valider et créer le compte"}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={handleGenreSubmit}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Enregistrement..." : "Valider et créer le compte"}
+                  </button>
                 </div>
               </div>
             </div>
