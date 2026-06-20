@@ -293,23 +293,11 @@ input:-internal-autofill-selected {
 
 .modal-card {
   width: min(520px, 100%);
-  max-height: 92vh;
-  overflow-y: auto;
   background: #ffffff;
   border-radius: 24px;
   padding: 28px 26px;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
   animation: fadeIn 0.22s ease;
-}
-
-@media (max-width: 640px) {
-  .genre-group-items {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-card {
-    padding: 22px 18px;
-  }
 }
 
 .modal-header h3 {
@@ -403,15 +391,8 @@ input:-internal-autofill-selected {
 
 .modal-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-end;
   gap: 12px;
-}
-
-.genre-note {
-  margin: 0;
-  font-size: 13px;
-  color: #4b5563;
 }
 
 .btn-secondary {

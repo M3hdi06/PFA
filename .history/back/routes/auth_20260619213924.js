@@ -41,7 +41,7 @@ router.post("/register", async (req, res) => {
       success: true,
       message: "Inscription réussie",
       token,
-      user: { id: user._id, nom: user.nom, email: user.email, genres: user.genres }
+      user: { id: user._1? user._id : user.id, nom: user.nom, email: user.email, genres: user.genres }
     });
   } catch (error) {
     console.error("Erreur inscription:", error);
@@ -64,7 +64,7 @@ router.post("/login", async (req, res) => {
     if (!isPasswordCorrect) return res.status(401).json({ success: false, message: "Email ou mot de passe incorrect" });
 
     const token = generateToken(user._id);
-    res.status(200).json({ success: true, message: "Connexion réussie", token, user: { id: user._id, nom: user.nom, email: user.email, genres: user.genres } });
+    res.status(200).json({ success: true, message: "Connexion réussie", token, user: { id: user._id, nom: user.nom, email: user.email } });
   } catch (error) {
     console.error("Erreur connexion:", error);
     res.status(500).json({ success: false, message: "Erreur lors de la connexion", error: error.message });
@@ -83,7 +83,7 @@ router.get("/me", async (req, res) => {
     const user = await User.findById(decoded.userId);
     if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
 
-    res.status(200).json({ success: true, user: { id: user._id, nom: user.nom, email: user.email, genres: user.genres } });
+    res.status(200).json({ success: true, user: { id: user._id, nom: user.nom, email: user.email } });
   } catch (error) {
     res.status(401).json({ success: false, message: "Token invalide" });
   }

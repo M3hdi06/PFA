@@ -143,32 +143,12 @@ const Home = () => {
 
 
 
-  const refreshCurrentUser = useCallback(async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) return;
-
-    try {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-
-      if (response.ok && data.user) {
-        setCurrentUser(data.user);
-      }
-    } catch (err) {
-      console.error('Erreur chargement profil utilisateur:', err);
-    }
-  }, []);
-
   useEffect(() => {
     fetchPosts();
     setCurrentUser(getStoredUser());
-    refreshCurrentUser();
 
     const handleAuthChange = () => {
       setCurrentUser(getStoredUser());
-      refreshCurrentUser();
     };
 
     window.addEventListener('authChange', handleAuthChange);
@@ -178,7 +158,7 @@ const Home = () => {
       window.removeEventListener('authChange', handleAuthChange);
       window.removeEventListener('storage', handleAuthChange);
     };
-  }, [fetchPosts, refreshCurrentUser]);
+  }, [fetchPosts]);
 
 
 

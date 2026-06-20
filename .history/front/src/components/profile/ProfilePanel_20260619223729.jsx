@@ -279,22 +279,18 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
                 </li>
               </ul>
 
-              <div className="profile-panel__hashtags-section">
-                <h4 className="profile-panel__hashtags-title">Genres préférés</h4>
-                <div className="profile-panel__hashtags-list">
-                  {Array.isArray(user.genres) && user.genres.length > 0 ? (
-                    user.genres.map((genre) => (
+              {Array.isArray(user.genres) && user.genres.length > 0 && (
+                <div className="profile-panel__hashtags-section">
+                  <h4 className="profile-panel__hashtags-title">Genres préférés</h4>
+                  <div className="profile-panel__hashtags-list">
+                    {user.genres.map((genre) => (
                       <span key={genre} className="profile-panel__hashtag-pill">
                         {formatHashtag(genre)}
                       </span>
-                    ))
-                  ) : (
-                    <span className="profile-panel__hashtag-empty">
-                      Aucun genre préféré sélectionné.
-                    </span>
-                  )}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </section>
           ) : (
             <section className="profile-panel__section">

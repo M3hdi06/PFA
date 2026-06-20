@@ -83,7 +83,7 @@ router.get("/me", async (req, res) => {
     const user = await User.findById(decoded.userId);
     if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
 
-    res.status(200).json({ success: true, user: { id: user._id, nom: user.nom, email: user.email, genres: user.genres } });
+    res.status(200).json({ success: true, user: { id: user._id, nom: user.nom, email: user.email } });
   } catch (error) {
     res.status(401).json({ success: false, message: "Token invalide" });
   }

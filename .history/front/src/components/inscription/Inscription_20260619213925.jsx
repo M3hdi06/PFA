@@ -4,179 +4,16 @@ import "./Inscription.css";
 import { useNavigate, Link } from "react-router-dom";
 import API_URL from "../../config/api";
 
-const genreGroups = [
-  {
-    title: "Rock & dérivés",
-    genres: [
-      "Rock",
-      "Rock alternatif",
-      "Rock indépendant (Indie rock)",
-      "Rock progressif",
-      "Hard rock",
-      "Soft rock",
-      "Punk rock",
-      "Post-punk",
-      "Garage rock",
-      "Grunge",
-      "Britpop",
-      "Shoegaze",
-      "Noise rock",
-      "Math rock",
-      "Glam rock",
-      "Classic rock",
-    ],
-  },
-  {
-    title: "Metal",
-    genres: [
-      "Heavy metal",
-      "Thrash metal",
-      "Death metal",
-      "Black metal",
-      "Power metal",
-      "Doom metal",
-      "Progressive metal",
-      "Metal alternatif",
-      "Nu metal",
-      "Metalcore",
-      "Deathcore",
-      "Symphonic metal",
-      "Industrial metal",
-      "Folk metal",
-    ],
-  },
-  {
-    title: "Pop",
-    genres: [
-      "Pop",
-      "Electropop",
-      "Synthpop",
-      "Indie pop",
-      "K-pop",
-      "J-pop",
-      "Latin pop",
-      "Dance pop",
-      "Teen pop",
-      "Pop rock",
-    ],
-  },
-  {
-    title: "Hip-Hop & Rap",
-    genres: [
-      "Hip-hop",
-      "Rap US",
-      "Rap FR",
-      "Trap",
-      "Drill (UK / US)",
-      "Boom bap",
-      "Cloud rap",
-      "Lo-fi hip-hop",
-      "Gangsta rap",
-      "Conscious rap",
-      "Emo rap",
-      "Old school hip-hop",
-    ],
-  },
-  {
-    title: "Électro / EDM",
-    genres: [
-      "EDM",
-      "House",
-      "Deep house",
-      "Tech house",
-      "Progressive house",
-      "Techno",
-      "Minimal techno",
-      "Trance",
-      "Psytrance",
-      "Hardstyle",
-      "Dubstep",
-      "Drum and bass",
-      "Jungle",
-      "Future bass",
-      "Electro swing",
-      "Ambient techno",
-    ],
-  },
-  {
-    title: "Jazz & Blues",
-    genres: [
-      "Jazz",
-      "Smooth jazz",
-      "Bebop",
-      "Swing",
-      "Fusion jazz",
-      "Blues",
-      "Blues rock",
-      "Soul blues",
-      "Jazz funk",
-      "Acid jazz",
-    ],
-  },
-  {
-    title: "Classique & orchestral",
-    genres: [
-      "Musique classique",
-      "Baroque",
-      "Romantique",
-      "Moderne classique",
-      "Musique de film (cinematic)",
-      "Opéra",
-      "Musique symphonique",
-      "Minimalisme (Steve Reich style)",
-    ],
-  },
-  {
-    title: "Folk & acoustique",
-    genres: [
-      "Folk",
-      "Indie folk",
-      "Folk rock",
-      "Americana",
-      "Country",
-      "Bluegrass",
-      "Celtic music",
-      "Singer-songwriter",
-      "Acoustic",
-    ],
-  },
-  {
-    title: "Musiques du monde",
-    genres: [
-      "Afrobeat",
-      "Amapiano",
-      "Highlife",
-      "Rai",
-      "Reggae",
-      "Dancehall",
-      "Reggaeton",
-      "Salsa",
-      "Bachata",
-      "Merengue",
-      "Flamenco",
-      "Bossa nova",
-      "Samba",
-      "Oriental / Arabesque",
-      "Gnawa",
-    ],
-  },
-  {
-    title: "Expérimental / niche",
-    genres: [
-      "Ambient",
-      "Dark ambient",
-      "Drone",
-      "Experimental",
-      "Noise",
-      "Glitch",
-      "IDM (Intelligent Dance Music)",
-      "Vaporwave",
-      "Synthwave",
-      "Chillwave",
-      "Lo-fi",
-      "Avant-garde",
-    ],
-  },
+const availableGenres = [
+  "rock",
+  "metal",
+  "shoegaze",
+  "jazz",
+  "rap",
+  "hip-hop",
+  "electro",
+  "punk",
+  "blues",
 ];
 
 const Inscription = () => {
@@ -399,29 +236,19 @@ const Inscription = () => {
                 {genreError && <div className="error-message">{genreError}</div>}
 
                 <div className="genres-grid">
-                  {genreGroups.map((group) => (
-                    <div className="genre-group" key={group.title}>
-                      <div className="genre-group-header">
-                        <span className="genre-group-number">{genreGroups.indexOf(group) + 1}.</span>
-                        <h4>{group.title}</h4>
-                      </div>
-                      <div className="genre-group-items">
-                        {group.genres.map((genre) => {
-                          const selected = selectedGenres.includes(genre);
-                          return (
-                            <button
-                              key={genre}
-                              type="button"
-                              className={`genre-pill ${selected ? "selected" : ""}`}
-                              onClick={() => toggleGenre(genre)}
-                            >
-                              {genre}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                  {availableGenres.map((genre) => {
+                    const selected = selectedGenres.includes(genre);
+                    return (
+                      <button
+                        key={genre}
+                        type="button"
+                        className={`genre-pill ${selected ? "selected" : ""}`}
+                        onClick={() => toggleGenre(genre)}
+                      >
+                        {genre}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <p className="genre-note">

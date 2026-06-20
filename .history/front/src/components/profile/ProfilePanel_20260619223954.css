@@ -243,8 +243,7 @@
   gap: 8px;
 }
 
-.profile-panel__hashtag-pill,
-.profile-panel__hashtag-empty {
+.profile-panel__hashtag-pill {
   display: inline-flex;
   align-items: center;
   padding: 7px 10px;
