@@ -357,6 +357,62 @@
 .home-column--center {
   flex: 0 0 56%;
   width: 56%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.home-center-viewport {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.08), rgba(30, 58, 95, 0.05));
+  border: 1px solid rgba(30, 58, 95, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  touch-action: pan-y;
+  position: relative;
+  overscroll-behavior: contain;
+}
+
+.home-center-track {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.18s ease-out;
+  will-change: transform;
+}
+
+.home-center-card {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--accent-2);
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(30, 58, 95, 0.08);
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+.home-center-card:last-child {
+  margin-bottom: 0;
+}
+
+.home-center-card span {
+  text-align: center;
 }
 
 .home-column--left:hover {

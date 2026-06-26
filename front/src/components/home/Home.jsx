@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import './Home.css';
 
@@ -71,7 +71,58 @@ const Home = () => {
 
   const [currentUser, setCurrentUser] = useState(getStoredUser);
 
+  const [activeIndex, setActiveIndex] = useState(0);
 
+  const [touchStartY, setTouchStartY] = useState(null);
+
+  const [cardHeight, setCardHeight] = useState(0);
+
+  const cardRef = useRef(null);
+
+  const centerCards = ['Bloc 1', 'Bloc 2', 'Bloc 3'];
+  const cardGap = 16;
+
+  const handleSwipeStart = (event) => {
+    setTouchStartY(event.touches[0].clientY);
+  };
+
+  const handleSwipeEnd = (event) => {
+    if (touchStartY === null) return;
+
+    const deltaY = event.changedTouches[0].clientY - touchStartY;
+    const swipeThreshold = 20;
+
+    if (deltaY < -swipeThreshold) {
+      setActiveIndex((prev) => (prev + 1) % centerCards.length);
+    } else if (deltaY > swipeThreshold) {
+      setActiveIndex((prev) => (prev - 1 + centerCards.length) % centerCards.length);
+    }
+
+    setTouchStartY(null);
+  };
+
+  const handleWheel = (event) => {
+    if (event.deltaY > 0) {
+      setActiveIndex((prev) => (prev + 1) % centerCards.length);
+    } else if (event.deltaY < 0) {
+      setActiveIndex((prev) => (prev - 1 + centerCards.length) % centerCards.length);
+    }
+  };
+
+
+
+  useEffect(() => {
+    const updateCardHeight = () => {
+      if (cardRef.current) {
+        setCardHeight(cardRef.current.offsetHeight);
+      }
+    };
+
+    updateCardHeight();
+    window.addEventListener('resize', updateCardHeight);
+
+    return () => window.removeEventListener('resize', updateCardHeight);
+  }, []);
 
   const fetchPosts = useCallback(async () => {
 
@@ -519,9 +570,29 @@ const Home = () => {
 
         <div className="home-column home-column--center">
 
-          <h2>Colonne 2</h2>
+          <h2>For You Page</h2>
 
-          <p>Contenu principal de la colonne centrale.</p>
+          <div
+            className="home-center-viewport"
+            onTouchStart={handleSwipeStart}
+            onTouchEnd={handleSwipeEnd}
+            onWheel={handleWheel}
+          >
+            <div
+              className="home-center-track"
+              style={{ transform: `translateY(-${activeIndex * (cardHeight + cardGap)}px)` }}
+            >
+              {centerCards.map((label, index) => (
+                <div
+                  key={label}
+                  ref={index === 0 ? cardRef : null}
+                  className="home-center-card"
+                >
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
 
         </div>
 
