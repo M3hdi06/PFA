@@ -109,6 +109,39 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// @GET /api/auth/search
+router.get("/search", async (req, res) => {
+  try {
+    const rawQuery = req.query.q || req.query.query || "";
+    const normalizedQuery = String(rawQuery).trim().replace(/^#/, "").toLowerCase();
+
+    const users = await User.find({}, { password: 0 }).sort({ createdAt: -1 });
+
+    if (!normalizedQuery) {
+      return res.status(200).json({ success: true, results: users, query: "" });
+    }
+
+    const filteredUsers = users.filter((user) => {
+      const haystacks = [
+        user.nom,
+        user.email,
+        user.role,
+        ...(user.genres || []),
+        ...(user.profileOptions || []),
+      ]
+        .filter(Boolean)
+        .map((value) => String(value).toLowerCase());
+
+      return haystacks.some((value) => value.includes(normalizedQuery));
+    });
+
+    res.status(200).json({ success: true, results: filteredUsers, query: normalizedQuery });
+  } catch (error) {
+    console.error("Erreur recherche utilisateurs:", error);
+    res.status(500).json({ success: false, message: "Erreur lors de la recherche", error: error.message });
+  }
+});
+
 // @GET /api/auth/me
 router.get("/me", async (req, res) => {
   try {

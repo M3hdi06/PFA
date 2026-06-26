@@ -1,52 +1,36 @@
 .search-page {
   min-height: 100vh;
-  background-color: #eef4fb;
-  padding: 0;
+  background: linear-gradient(135deg, #eef4fb 0%, #f7f9fc 100%);
+  padding: 24px;
   margin: 0;
 }
 
 .search-page-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  height: calc(100vh - 60px);
-  gap: 0;
+  gap: 20px;
+  align-items: flex-start;
 }
 
 .search-column {
   padding: 20px;
   background-color: #ffffff;
-  overflow-y: auto;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
   min-width: 0;
   color: #172033;
 }
 
-.search-column:last-child {
-  border-right: none;
-}
-
 .search-column--left {
-  flex: 0 0 22%;
-  width: 22%;
+  flex: 0 0 260px;
 }
 
 .search-column--center {
-  flex: 0 0 56%;
-  width: 56%;
+  flex: 1 1 420px;
 }
 
 .search-column--right {
-  flex: 0 0 22%;
-  width: 22%;
-}
-
-.search-results {
-  margin-top: 16px;
-}
-
-.search-results ul {
-  padding-left: 20px;
+  flex: 0 0 260px;
 }
 
 .search-page h2,
@@ -54,13 +38,82 @@
 .search-page label,
 .search-page th,
 .search-page td {
-  color: #1E3A5F;
+  color: #1e3a5f;
+}
+
+.search-page__hint,
+.search-page__status,
+.search-page__empty {
+  margin-top: 10px;
+  color: #4b5d78;
+}
+
+.search-page__status--error {
+  color: #c2410c;
+}
+
+.search-results {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.search-result-card {
+  border: 1px solid #e5ebf2;
+  border-radius: 14px;
+  padding: 14px;
+  background: #fafcff;
+}
+
+.search-result-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.search-result-card__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  font-weight: 700;
+}
+
+.search-result-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.search-result-card__pill,
+.search-result-card__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e8eef8;
+  color: #2c4b74;
+  font-size: 0.8rem;
+}
+
+.search-result-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 @media (max-width: 1024px) {
+  .search-page {
+    padding: 16px;
+  }
+
   .search-page-container {
     flex-direction: column;
-    height: auto;
   }
 
   .search-column,
@@ -69,9 +122,5 @@
   .search-column--right {
     flex: 0 0 auto;
     width: 100%;
-    border-right: none;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  .search-column:last-child {
-    border-bottom: none;
   }
 }
