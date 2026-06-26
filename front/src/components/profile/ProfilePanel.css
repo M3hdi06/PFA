@@ -449,6 +449,115 @@
   justify-content: flex-end;
 }
 
+.profile-panel__genre-toggle {
+  width: 100%;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 14px;
+  border: 0.5px solid rgba(30, 58, 95, 0.2);
+  border-radius: var(--pp-radius-el);
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--pp-transition), box-shadow var(--pp-transition), background var(--pp-transition);
+}
+
+.profile-panel__genre-toggle:hover {
+  border-color: rgba(232, 65, 24, 0.35);
+  background: rgba(232, 65, 24, 0.03);
+  box-shadow: 0 1px 4px rgba(30, 58, 95, 0.06);
+}
+
+.profile-panel__genre-picker {
+  margin-top: 8px;
+  padding: 10px;
+  border: 0.5px solid rgba(30, 58, 95, 0.12);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.profile-panel__genre-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-panel__genre-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-panel__genre-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.profile-panel__genre-group-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pp-accent);
+}
+
+.profile-panel__genre-group-header h4 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  flex: 1;
+}
+
+.profile-panel__genre-group-caret {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.profile-panel__genre-group-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profile-panel__genre-pill {
+  border: 0.5px solid rgba(30, 58, 95, 0.16);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--pp-transition);
+}
+
+.profile-panel__genre-pill:hover {
+  border-color: rgba(232, 65, 24, 0.3);
+  color: var(--pp-accent);
+}
+
+.profile-panel__genre-pill--selected {
+  background: rgba(232, 65, 24, 0.12);
+  border-color: rgba(232, 65, 24, 0.3);
+  color: #c2410c;
+}
+
+.profile-panel__genre-help {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
 .profile-panel__btn {
   border: none;
   border-radius: 999px;

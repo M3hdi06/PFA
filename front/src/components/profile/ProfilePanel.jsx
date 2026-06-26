@@ -100,6 +100,182 @@ const formatHashtag = (genre) => {
     .replace(/[^a-z0-9]/gi, '');
   return `#${normalized}`;
 };
+
+const genreGroups = [
+  {
+    title: 'Rock & dérivés',
+    genres: [
+      'Rock',
+      'Rock alternatif',
+      'Rock indépendant (Indie rock)',
+      'Rock progressif',
+      'Hard rock',
+      'Soft rock',
+      'Punk rock',
+      'Post-punk',
+      'Garage rock',
+      'Grunge',
+      'Britpop',
+      'Shoegaze',
+      'Noise rock',
+      'Math rock',
+      'Glam rock',
+      'Classic rock',
+    ],
+  },
+  {
+    title: 'Metal',
+    genres: [
+      'Heavy metal',
+      'Thrash metal',
+      'Death metal',
+      'Black metal',
+      'Power metal',
+      'Doom metal',
+      'Progressive metal',
+      'Metal alternatif',
+      'Nu metal',
+      'Metalcore',
+      'Deathcore',
+      'Symphonic metal',
+      'Industrial metal',
+      'Folk metal',
+    ],
+  },
+  {
+    title: 'Pop',
+    genres: [
+      'Pop',
+      'Electropop',
+      'Synthpop',
+      'Indie pop',
+      'K-pop',
+      'J-pop',
+      'Latin pop',
+      'Dance pop',
+      'Teen pop',
+      'Pop rock',
+    ],
+  },
+  {
+    title: 'Hip-Hop & Rap',
+    genres: [
+      'Hip-hop',
+      'Rap US',
+      'Rap FR',
+      'Trap',
+      'Drill (UK / US)',
+      'Boom bap',
+      'Cloud rap',
+      'Lo-fi hip-hop',
+      'Gangsta rap',
+      'Conscious rap',
+      'Emo rap',
+      'Old school hip-hop',
+    ],
+  },
+  {
+    title: 'Électro / EDM',
+    genres: [
+      'EDM',
+      'House',
+      'Deep house',
+      'Tech house',
+      'Progressive house',
+      'Techno',
+      'Minimal techno',
+      'Trance',
+      'Psytrance',
+      'Hardstyle',
+      'Dubstep',
+      'Drum and bass',
+      'Jungle',
+      'Future bass',
+      'Electro swing',
+      'Ambient techno',
+    ],
+  },
+  {
+    title: 'Jazz & Blues',
+    genres: [
+      'Jazz',
+      'Smooth jazz',
+      'Bebop',
+      'Swing',
+      'Fusion jazz',
+      'Blues',
+      'Blues rock',
+      'Soul blues',
+      'Jazz funk',
+      'Acid jazz',
+    ],
+  },
+  {
+    title: 'Classique & orchestral',
+    genres: [
+      'Musique classique',
+      'Baroque',
+      'Romantique',
+      'Moderne classique',
+      'Musique de film (cinematic)',
+      'Opéra',
+      'Musique symphonique',
+      'Minimalisme (Steve Reich style)',
+    ],
+  },
+  {
+    title: 'Folk & acoustique',
+    genres: [
+      'Folk',
+      'Indie folk',
+      'Folk rock',
+      'Americana',
+      'Country',
+      'Bluegrass',
+      'Celtic music',
+      'Singer-songwriter',
+      'Acoustic',
+    ],
+  },
+  {
+    title: 'Musiques du monde',
+    genres: [
+      'Afrobeat',
+      'Amapiano',
+      'Highlife',
+      'Rai',
+      'Reggae',
+      'Dancehall',
+      'Reggaeton',
+      'Salsa',
+      'Bachata',
+      'Merengue',
+      'Flamenco',
+      'Bossa nova',
+      'Samba',
+      'Oriental / Arabesque',
+      'Gnawa',
+    ],
+  },
+  {
+    title: 'Expérimental / niche',
+    genres: [
+      'Ambient',
+      'Dark ambient',
+      'Drone',
+      'Experimental',
+      'Noise',
+      'Glitch',
+      'IDM (Intelligent Dance Music)',
+      'Vaporwave',
+      'Synthwave',
+      'Chillwave',
+      'Lo-fi',
+      'Avant-garde',
+    ],
+  },
+];
+
 /* ─── Component ───────────────────────────────────── */
 
 const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
@@ -113,6 +289,10 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
   const [postTitle, setPostTitle] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [postMessage, setPostMessage] = useState(null);
+  const [showGenrePicker, setShowGenrePicker] = useState(false);
+  const [openGenreGroup, setOpenGenreGroup] = useState(null);
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [genreError, setGenreError] = useState('');
 
   const syncForm = useCallback((u) => {
     if (!u) return;
@@ -203,6 +383,32 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
     }
   };
 
+  const toggleGenre = (genre) => {
+    if (selectedGenres.includes(genre)) {
+      setSelectedGenres((prev) => prev.filter((item) => item !== genre));
+      setGenreError('');
+      return;
+    }
+
+    if (selectedGenres.length >= 5) {
+      setGenreError('Vous pouvez sélectionner jusqu\'à 5 genres.');
+      return;
+    }
+
+    setSelectedGenres((prev) => [...prev, genre]);
+    setGenreError('');
+  };
+
+  const closePostModal = () => {
+    setIsPostModalOpen(false);
+    setShowGenrePicker(false);
+    setOpenGenreGroup(null);
+    setSelectedGenres([]);
+    setGenreError('');
+    setPostTitle('');
+    setPostMessage(null);
+  };
+
   const handlePost = async (event) => {
     event?.preventDefault();
     const userId = getUserId(user);
@@ -226,8 +432,7 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
 
       if (res.ok && data.data) {
         onPostCreated?.(data.data);
-        setIsPostModalOpen(false);
-        setPostTitle('');
+        closePostModal();
       } else {
         setPostMessage({ type: 'error', text: 'Erreur post' });
       }
@@ -452,7 +657,7 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
       </div>
 
       {isPostModalOpen && (
-        <div className="profile-panel__modal-overlay" onClick={() => setIsPostModalOpen(false)}>
+        <div className="profile-panel__modal-overlay" onClick={closePostModal}>
           <div className="profile-panel__modal" onClick={(e) => e.stopPropagation()}>
             <div className="profile-panel__modal-header">
               <div>
@@ -462,7 +667,7 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
               <button
                 type="button"
                 className="profile-panel__modal-close"
-                onClick={() => setIsPostModalOpen(false)}
+                onClick={closePostModal}
                 aria-label="Fermer"
               >
                 ×
@@ -490,6 +695,77 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
                 />
               </div>
 
+              <div className="profile-panel__field">
+                <label className="profile-panel__field-label">Genres</label>
+                <button
+                  type="button"
+                  className="profile-panel__genre-toggle"
+                  onClick={() => {
+                    setShowGenrePicker((prev) => !prev);
+                    setOpenGenreGroup(null);
+                  }}
+                >
+                  # Ajouter des genres
+                </button>
+
+                {showGenrePicker && (
+                  <div className="profile-panel__genre-picker">
+                    {genreError && <div className="profile-panel__toast profile-panel__toast--error">{genreError}</div>}
+
+                    <div className="profile-panel__genre-groups">
+                      {genreGroups.map((group, index) => {
+                        const isOpen = openGenreGroup === group.title;
+                        return (
+                          <div className="profile-panel__genre-group" key={group.title}>
+                            <button
+                              type="button"
+                              className="profile-panel__genre-group-header"
+                              onClick={() => setOpenGenreGroup(isOpen ? null : group.title)}
+                            >
+                              <span className="profile-panel__genre-group-number">{index + 1}.</span>
+                              <h4>{group.title}</h4>
+                              <span className="profile-panel__genre-group-caret">{isOpen ? '▾' : '▸'}</span>
+                            </button>
+
+                            {isOpen && (
+                              <div className="profile-panel__genre-group-items">
+                                {group.genres.map((genre) => {
+                                  const selected = selectedGenres.includes(genre);
+                                  return (
+                                    <button
+                                      key={genre}
+                                      type="button"
+                                      className={`profile-panel__genre-pill ${selected ? 'profile-panel__genre-pill--selected' : ''}`}
+                                      onClick={() => toggleGenre(genre)}
+                                    >
+                                      {genre}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <p className="profile-panel__genre-help">
+                      Genres choisis : {selectedGenres.length} / 5
+                    </p>
+                  </div>
+                )}
+
+                {selectedGenres.length > 0 && (
+                  <div className="profile-panel__hashtags-list">
+                    {selectedGenres.map((genre) => (
+                      <span key={genre} className="profile-panel__hashtag-pill">
+                        {formatHashtag(genre)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="profile-panel__form-actions">
                 <button
                   type="submit"
@@ -501,7 +777,7 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
                 <button
                   type="button"
                   className="profile-panel__btn profile-panel__btn--secondary"
-                  onClick={() => setIsPostModalOpen(false)}
+                  onClick={closePostModal}
                 >
                   Annuler
                 </button>
