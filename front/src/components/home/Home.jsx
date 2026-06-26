@@ -80,7 +80,7 @@ const Home = () => {
   const cardRef = useRef(null);
 
   const centerCards = ['Bloc 1', 'Bloc 2', 'Bloc 3'];
-  const cardGap = 16;
+  const cardGap = 0;
 
   const handleSwipeStart = (event) => {
     setTouchStartY(event.touches[0].clientY);
