@@ -78,8 +78,25 @@ const Home = () => {
   const [cardHeight, setCardHeight] = useState(0);
 
   const cardRef = useRef(null);
+  const audioRefs = useRef([]);
 
-  const centerCards = ['Bloc 1', 'Bloc 2', 'Bloc 3'];
+  const centerCards = [
+    {
+      title: 'Bloc 1',
+      image: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80',
+      audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    },
+    {
+      title: 'Bloc 2',
+      image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=800&q=80',
+      audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    },
+    {
+      title: 'Bloc 3',
+      image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=800&q=80',
+      audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    },
+  ];
   const cardGap = 0;
 
   const handleSwipeStart = (event) => {
@@ -123,6 +140,20 @@ const Home = () => {
 
     return () => window.removeEventListener('resize', updateCardHeight);
   }, []);
+
+  useEffect(() => {
+    audioRefs.current.forEach((audio, index) => {
+      if (!audio) return;
+
+      if (index === activeIndex) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    });
+  }, [activeIndex]);
 
   const fetchPosts = useCallback(async () => {
 
@@ -582,13 +613,29 @@ const Home = () => {
               className="home-center-track"
               style={{ transform: `translateY(-${activeIndex * (cardHeight + cardGap)}px)` }}
             >
-              {centerCards.map((label, index) => (
+              {centerCards.map((card, index) => (
                 <div
-                  key={label}
+                  key={card.title}
                   ref={index === 0 ? cardRef : null}
                   className="home-center-card"
                 >
-                  <span>{label}</span>
+                  <div className="home-card-image">
+                    <img src={card.image} alt={card.title} />
+                  </div>
+                  <div className="home-card-title">
+                    <h3>{card.title}</h3>
+                  </div>
+                  <div className="home-card-audio">
+                    <audio
+                      controls
+                      preload="none"
+                      ref={(element) => {
+                        audioRefs.current[index] = element;
+                      }}
+                    >
+                      <source src={card.audio} type="audio/mpeg" />
+                    </audio>
+                  </div>
                 </div>
               ))}
             </div>
