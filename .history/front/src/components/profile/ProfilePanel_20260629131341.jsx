@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import API_URL from '../../config/api';
 import './ProfilePanel.css';
@@ -111,15 +111,12 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [postTitle, setPostTitle] = useState('');
-  const [postHashtags, setPostHashtags] = useState('');
+  const [postDescription, setPostDescription] = useState('');
+  const [hashtagsInput, setHashtagsInput] = useState('');
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
   const [audioFile, setAudioFile] = useState(null);
-  const [audioPreviewName, setAudioPreviewName] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [postMessage, setPostMessage] = useState(null);
-  const imageInputRef = useRef(null);
-  const audioInputRef = useRef(null);
 
   const syncForm = useCallback((u) => {
     if (!u) return;
@@ -169,11 +166,6 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
     };
   }, [userProp, refreshProfile, syncForm]);
 
-  useEffect(() => {
-    if (!imagePreview) return undefined;
-    return () => URL.revokeObjectURL(imagePreview);
-  }, [imagePreview]);
-
   const handleChange = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
     setMessage(null);
@@ -215,26 +207,22 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
     }
   };
 
-  const handleImagePick = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0] || null;
     setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleAudioPick = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleAudioChange = (event) => {
+    const file = event.target.files?.[0] || null;
     setAudioFile(file);
-    setAudioPreviewName(file.name);
   };
 
   const handlePost = async (event) => {
     event?.preventDefault();
     const userId = getUserId(user);
 
-    if (!userId || !postTitle.trim()) {
-      setPostMessage({ type: 'error', text: 'Veuillez saisir un titre pour le post.' });
+    if (!userId || (!postTitle.trim() && !postDescription.trim() && !imageFile && !audioFile)) {
+      setPostMessage({ type: 'error', text: 'Ajoutez un titre, un contenu ou un média avant de publier.' });
       return;
     }
 
@@ -244,13 +232,16 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
     try {
       const formData = new FormData();
       formData.append('userId', userId);
-      formData.append('text', postTitle.trim());
-      formData.append('hashtags', postHashtags);
+      formData.append('title', postTitle.trim());
+      formData.append('text', postDescription.trim());
+      formData.append('hashtags', hashtagsInput.trim());
       if (imageFile) formData.append('image', imageFile);
       if (audioFile) formData.append('audio', audioFile);
 
+      const token = localStorage.getItem('authToken');
       const res = await fetch(`${API_URL}/api/posts`, {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
       });
 
@@ -260,12 +251,11 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
         onPostCreated?.(data.data);
         setIsPostModalOpen(false);
         setPostTitle('');
-        setPostHashtags('');
+        setPostDescription('');
+        setHashtagsInput('');
         setImageFile(null);
-        setImagePreview('');
         setAudioFile(null);
-        setAudioPreviewName('');
-        setPostMessage({ type: 'success', text: 'Post publié avec succès' });
+        setPostMessage({ type: 'success', text: 'Post publié avec succès.' });
       } else {
         setPostMessage({ type: 'error', text: data.message || 'Erreur post' });
       }
@@ -508,50 +498,13 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
             </div>
 
             <div className="profile-panel__media-preview">
-              <div
-                className="profile-panel__media-card profile-panel__image-card"
-                onClick={() => imageInputRef.current?.click()}
-              >
-                <input
-                  ref={imageInputRef}
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleImagePick}
-                />
-                {imagePreview ? (
-                  <div className="profile-panel__upload-preview">
-                    <img src={imagePreview} alt="Prévisualisation" />
-                    <small>{imageFile?.name}</small>
-                  </div>
-                ) : (
-                  <>
-                    <span>Image</span>
-                    <small>Ajoutez une photo</small>
-                  </>
-                )}
+              <div className="profile-panel__media-card profile-panel__image-card">
+                <span>Image</span>
+                <small>{imageFile ? imageFile.name : 'Aucune image sélectionnée'}</small>
               </div>
-              <div
-                className="profile-panel__media-card profile-panel__audio-card"
-                onClick={() => audioInputRef.current?.click()}
-              >
-                <input
-                  ref={audioInputRef}
-                  type="file"
-                  accept="audio/*"
-                  hidden
-                  onChange={handleAudioPick}
-                />
-                {audioPreviewName ? (
-                  <div className="profile-panel__upload-preview">
-                    <small>{audioPreviewName}</small>
-                  </div>
-                ) : (
-                  <>
-                    <span>Audio</span>
-                    <small>Ajoutez un fichier audio</small>
-                  </>
-                )}
+              <div className="profile-panel__media-card profile-panel__audio-card">
+                <span>Audio</span>
+                <small>{audioFile ? audioFile.name : 'Aucun audio sélectionné'}</small>
               </div>
             </div>
 
@@ -567,13 +520,34 @@ const ProfilePanel = ({ user: userProp, onUserUpdate, onPostCreated }) => {
               </div>
 
               <div className="profile-panel__field">
+                <label className="profile-panel__field-label">Description</label>
+                <textarea
+                  name="postDescription"
+                  value={postDescription}
+                  onChange={(e) => setPostDescription(e.target.value)}
+                  placeholder="Ajoutez un message ou un contexte"
+                  rows="3"
+                />
+              </div>
+
+              <div className="profile-panel__field">
                 <label className="profile-panel__field-label">Hashtags</label>
                 <input
-                  name="postHashtags"
-                  value={postHashtags}
-                  onChange={(e) => setPostHashtags(e.target.value)}
-                  placeholder="#music #live"
+                  name="hashtags"
+                  value={hashtagsInput}
+                  onChange={(e) => setHashtagsInput(e.target.value)}
+                  placeholder="#music #studio #newtrack"
                 />
+              </div>
+
+              <div className="profile-panel__field">
+                <label className="profile-panel__field-label">Image</label>
+                <input type="file" accept="image/*" onChange={handleImageChange} />
+              </div>
+
+              <div className="profile-panel__field">
+                <label className="profile-panel__field-label">Audio</label>
+                <input type="file" accept="audio/*" onChange={handleAudioChange} />
               </div>
 
               <div className="profile-panel__form-actions">

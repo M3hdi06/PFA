@@ -5,42 +5,38 @@ const Post = require("../models/Post");
 const { authMiddleware } = require("../middleware/auth");
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/") || file.mimetype.startsWith("audio/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Type de fichier non pris en charge"));
-    }
-  }
-});
-
-const uploadToCloudinary = (file, resourceType) => new Promise((resolve, reject) => {
-  const stream = cloudinary.uploader.upload_stream(
-    {
-      folder: "prepfa/posts",
-      resource_type: resourceType,
-    },
-    (error, result) => {
-      if (error) reject(error);
-      else resolve(result);
-    }
-  );
-
-  stream.end(file.buffer);
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 const hasUserLiked = (likes, userId) =>
   likes.some((id) => id.toString() === userId.toString());
+
+const parseHashtags = (value) => {
+  if (!value) return [];
+
+  return String(value)
+    .split(/[,\s]+/)
+    .map((tag) => tag.replace(/^#/, "").trim())
+    .filter(Boolean);
+};
+
+const uploadToCloudinary = (file, resourceType = "image") =>
+  new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: resourceType === "audio" ? "video" : "image" },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+
+    uploadStream.end(file.buffer);
+  });
 
 // GET /api/posts
 router.get("/", async (req, res) => {
@@ -61,44 +57,43 @@ router.get("/", async (req, res) => {
 });
 
 // POST /api/posts
-router.post("/", upload.fields([{ name: "image", maxCount: 1 }, { name: "audio", maxCount: 1 }]), async (req, res) => {
+router.post("/", upload.fields([
+  { name: "image", maxCount: 1 },
+  { name: "audio", maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { userId, text, hashtags = "" } = req.body;
+    const { userId, title, text } = req.body;
+    const hashtags = parseHashtags(req.body.hashtags);
     const imageFile = req.files?.image?.[0];
     const audioFile = req.files?.audio?.[0];
 
-    if (!userId || !text?.trim()) {
+    if (!userId || (!title?.trim() && !text?.trim() && !imageFile && !audioFile)) {
       return res.status(400).json({
         success: false,
-        message: "userId et text sont requis"
+        message: "userId, un titre/texte ou un média est requis"
       });
     }
 
-    const parsedHashtags = hashtags
-      .split(/\s+/)
-      .map((tag) => tag.trim())
-      .filter(Boolean)
-      .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`));
-
-    let imageUrl = "";
-    let audioUrl = "";
+    const media = {};
 
     if (imageFile) {
       const uploadedImage = await uploadToCloudinary(imageFile, "image");
-      imageUrl = uploadedImage.secure_url;
+      media.imageUrl = uploadedImage.secure_url;
+      media.imagePublicId = uploadedImage.public_id;
     }
 
     if (audioFile) {
-      const uploadedAudio = await uploadToCloudinary(audioFile, "video");
-      audioUrl = uploadedAudio.secure_url;
+      const uploadedAudio = await uploadToCloudinary(audioFile, "audio");
+      media.audioUrl = uploadedAudio.secure_url;
+      media.audioPublicId = uploadedAudio.public_id;
     }
 
     const post = await Post.create({
       userId,
-      text: text.trim(),
-      hashtags: parsedHashtags,
-      imageUrl,
-      audioUrl,
+      title: title?.trim() || "",
+      text: text?.trim() || "",
+      hashtags,
+      media
     });
 
     const populated = await Post.findById(post._id).populate("userId", "nom email");

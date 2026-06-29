@@ -11,18 +11,6 @@ const postSchema = new mongoose.Schema({
     trim: true,
     required: true
   },
-  hashtags: {
-    type: [String],
-    default: []
-  },
-  imageUrl: {
-    type: String,
-    default: ""
-  },
-  audioUrl: {
-    type: String,
-    default: ""
-  },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
