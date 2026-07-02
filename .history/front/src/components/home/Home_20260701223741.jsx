@@ -79,7 +79,7 @@ const Home = () => {
   const cardRef = useRef(null);
   const audioRefs = useRef([]);
 
-  const userId = getUserId(currentUser);
+  const userId = getUserId(getStoredUser()) || getUserId(currentUser);
 
   const {
     visibleRecommendations,

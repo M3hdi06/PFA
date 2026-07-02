@@ -39,8 +39,11 @@ app.use((req, res, next) => {
   next();
 });
 
+const { getRecommendations } = require("./controllers/recommendationsController");
+
 // Routes test
 app.get("/", (req, res) => res.send("Hello Amine"));
+app.get("/api/recommendations/:userId", getRecommendations);
 
 app.use("/api", (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {

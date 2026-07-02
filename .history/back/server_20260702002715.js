@@ -74,7 +74,7 @@ async function startServer() {
   app.use("/api/spots", spotsRoutes);
   app.use("/api/posts", postsRoutes);
   app.use("/api/comments", commentsRoutes);
-  app.use("/api/recommendations", recommendationsRoutes);
+  app.use("/api", recommendationsRoutes);
 
   app.listen(port, () => {
     console.log(`🚀 Server is running on port ${port}`);
